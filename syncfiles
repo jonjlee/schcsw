@@ -1,0 +1,18 @@
+#!/bin/bash
+
+src=~/storage/downloads/dev-files/schcsw-app/
+listcommand="ls -lR $src"
+
+newfilelist=$( $listcommand )
+while true
+do
+   if [[ $oldfilelist != $newfilelist ]]
+   then
+      oldfilelist=$newfilelist
+
+      # run your synchronization tool
+      rsync -r --progress --update --delete $src app/
+   fi
+   sleep 1 || exit 2 
+   newfilelist=$( $listcommand )
+done
