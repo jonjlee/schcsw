@@ -39,10 +39,12 @@ class SepsisCalcScreen extends Component {
     return (
       <View style={ styles.optionRow }>
         <Text style={ styles.optionText }>{ text }</Text>
-        <Switch
-          style={ styles.optionVal }
-          onValueChange={ value => this.setState({ [stateVar]: value }) }
-          value={ this.state[stateVar] } />
+        <View style={ styles.optionValContainer }>
+          <Switch
+            style={ styles.optionVal }
+            onValueChange={ value => this.setState({ [stateVar]: value }) }
+            value={ this.state[stateVar] } />
+        </View>
       </View>
     );
   }
@@ -105,9 +107,14 @@ const styles = StyleSheet.create({
   },
   optionText: {
     paddingRight: 10,
-    flex: 5,
+    flex: 4,
     fontSize: 16,
     color: palette.text
+  },
+  optionValContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end'
   },
   optionVal: {
     flex: 1,

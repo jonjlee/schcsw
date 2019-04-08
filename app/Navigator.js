@@ -7,6 +7,10 @@ import SettingsScreen from './screens/Settings';
 import PathwaysScreen from './screens/Pathways';
 import SepsisPathwayScreen from './screens/SepsisPathway';
 import ActivateSepsisPathwayScreen from './screens/SepsisPathway/ActivateSepsisPathwayScreen'
+import InitialResusScreen from './screens/SepsisPathway/InitialResusScreen'
+import OngoingResusScreen from './screens/SepsisPathway/OngoingResusScreen'
+import FollowupResusScreen from './screens/SepsisPathway/FollowupResusScreen'
+import SepsisAdmitScreen from './screens/SepsisPathway/SepsisAdmitScreen'
 import SepsisCalcScreen from './screens/SepsisCalc';
 import MAPGoalsScreen from './screens/MAPGoals';
 
@@ -25,7 +29,7 @@ const PathwaysStack = createStackNavigator(
   { PathwaysScreen, SettingsScreen },
   { defaultNavigationOptions });
 const SepsisPathwayStack = createStackNavigator(
-  { SepsisPathwayScreen, SepsisCalcScreen, MAPGoalsScreen, ActivateSepsisPathwayScreen },
+  { SepsisPathwayScreen, SepsisCalcScreen, MAPGoalsScreen, ActivateSepsisPathwayScreen, InitialResusScreen, OngoingResusScreen, FollowupResusScreen, SepsisAdmitScreen },
   { defaultNavigationOptions });
 
 const PathwaysNavigator = createSwitchNavigator(
@@ -34,7 +38,7 @@ const PathwaysNavigator = createSwitchNavigator(
     Sepsis: SepsisPathwayStack,
   },
   {
-    initalRouteName: 'Pathways',
+    initialRouteName: 'Pathways',
   });
 
 const Navigator = PathwaysNavigator;

@@ -5,15 +5,16 @@ class PathwaysScreen extends Component {
   static navigationOptions = ({ navigation, navigationOptions }) => {
     return {
       title: 'Pathways',
-      headerRight: (
-        <Icon
-          containerStyle = { styles.headerButton }
-          name = 'settings'
-          color = { navigationOptions.headerTintColor }
-          onPress = {() => {
-            navigation.navigate('SettingsScreen');
-          }}
-        />)
+      // headerRight: (
+      //   <Icon
+      //     containerStyle = { styles.headerButton }
+      //     name = 'settings'
+      //     color = { navigationOptions.headerTintColor }
+      //     underlayColor = { navigationOptions.headerStyle.backgroundColor }
+      //     onPress = {() => {
+      //       navigation.navigate('SettingsScreen');
+      //     }}
+      //   />)
     };
   };
   

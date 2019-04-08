@@ -1,25 +1,41 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Icon } from 'react-native-elements';
+import { Icon, Divider } from 'react-native-elements';
 
-export class WarnText extends Component {
-  render() {
-    const iconColor = this.props.iconColor || palette.hilite;
-    
-    return (
-      <View style={ [WarnTextStyles.container, this.props.containerStyle] }>
-        <View style={ [WarnTextStyles.iconContainer, this.props.iconContainerStyle] }>
-          <Icon type='font-awesome' name='warning' size={ 36 } color={ iconColor } />
-        </View>
-        <View style={ WarnTextStyles.textContainer }>
-          <Text style={ [WarnTextStyles.text, this.props.style] }>
-            { this.props.children }
-          </Text>
-        </View>
+export const WarnText = (props) => {
+  const iconColor = props.iconColor || palette.hilite;
+  return (
+    <View style={ [WarnTextStyles.container, props.containerStyle] }>
+      <View style={ [WarnTextStyles.iconContainer, props.iconContainerStyle] }>
+        <Icon type='font-awesome' name='warning' size={ 36 } color={ iconColor } />
       </View>
-    );
-  }
+      <View style={ WarnTextStyles.textContainer }>
+        <Text style={ [WarnTextStyles.text, props.style] }>
+          { props.children }
+        </Text>
+      </View>
+    </View>
+  );
 };
+
+export const ErrText = (props) => {
+  return (
+    <WarnText containerStyle={{ backgroundColor: 'coral' }} style={{ color: 'white' }}>
+      { props.children }
+    </WarnText>
+  )
+};
+
+export const Spacer = (props) => <View style={ [{ flex: 1}, props.style] } />
+
+export const Footer = (props) => {
+  return (
+    <View style={ FooterStyles.container }>
+      <Divider style={ FooterStyles.divider } />
+      { props.children }
+    </View>
+  );
+}
 
 export const palette = {
   background: '#FFFAFF',  // near white
@@ -60,3 +76,14 @@ const WarnTextStyles = StyleSheet.create({
   }
 });
 
+const FooterStyles = StyleSheet.create({
+  container: {
+    justifyContent: 'flex-end',
+    height: 55,
+  },
+  divider: {
+    marginBottom: 10,
+    height:1,
+    backgroundColor: palette.lightGray,
+  },
+});

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
-import { Divider, Button } from 'react-native-elements';
-import { WarnText, palette } from '../../common-components'
+import { Button } from 'react-native-elements';
+import { WarnText, Footer, palette } from '../../common-components'
 import HTML from 'react-native-render-html';
 
 const initialAssessmentHtml = `
@@ -50,24 +50,25 @@ class SepsisPathwayScreen extends Component {
   
   render() {
     return (
-      <ScrollView contentContainerStyle={ styles.container }>
-        <WarnText>
-          Use the ED Suspected Septic Shock pathway for ill appearing patients including HemOnc/BMT, Central Line Infection and Neonates.
-        </WarnText>
-        <HTML
-          html={ initialAssessmentHtml }
-          containerStyle={ styles.mainContent }
-          tagsStyles={ tagsStyles }
-          baseFontStyle={{ fontSize: 16 }}
-          onLinkPress={ this.onLinkPress } />
-        <View style={ styles.bottom }>
-          <Divider style={{ height:1, backgroundColor: palette.lightGray, marginBottom: 10 }} />
+      <View style={ styles.container }>
+        <ScrollView contentContainerStyle={ styles.contentContainer }>
+          <WarnText>
+            Use the ED Suspected Septic Shock pathway for ill appearing patients including HemOnc/BMT, Central Line Infection and Neonates.
+          </WarnText>
+          <HTML
+            html={ initialAssessmentHtml }
+            containerStyle={ styles.htmlContainer }
+            tagsStyles={ tagsStyles }
+            baseFontStyle={{ fontSize: 16 }}
+            onLinkPress={ this.onLinkPress } />
+        </ScrollView>
+        <Footer>
           <Button
             title="Start"
             buttonStyle={ styles.startButton }
             onPress={ () => this.props.navigation.navigate('ActivateSepsisPathwayScreen') } />
-        </View>
-      </ScrollView>
+        </Footer>
+      </View>
     );
   }
 }
@@ -78,29 +79,27 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 18
   },
-  bottom: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    marginBottom: 10
-  },
   container: {
     flex: 1,
     padding: 10,
     backgroundColor: palette.background,
-    alignItems: "stretch"
   },
-  mainContent: {
+  contentContainer: {
+    alignItems: 'stretch'
+  },
+  htmlContainer: {
     marginTop: 20,
     paddingLeft: 10,
     paddingRight: 10,
   },
   startButton: {
     paddingVertical: 10,
-  }
+    borderRadius: 5,
+  },
 });
 
 const tagsStyles = {
-  h4: { marginTop: 0, paddingBottom: 10 }
+  h4: { marginTop: 0, paddingBottom: 10, fontSize: 18 },
 };
 
 export default SepsisPathwayScreen;

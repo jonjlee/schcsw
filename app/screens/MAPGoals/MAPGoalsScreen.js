@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, ScrollView, Text } from 'react-native'
 import { palette } from '../../common-components'
-import HTML from 'react-native-render-html';
 
 class MAPGoalsScreen extends Component {
   static navigationOptions = ({ navigation, navigationOptions }) => {
@@ -9,23 +8,6 @@ class MAPGoalsScreen extends Component {
       title: '',
     }
   };
-
-  static html = `
-    <table>
-      <tr>
-        <td></td>
-        <td>Critial hypotension</td>
-        <td>Hypotension</td>
-        <td>Resuscitation Goal (Minimum)</td>
-        <td>Normotension (Median for Age)</td>
-      </tr>
-      <tr>
-        <td>Age</td>
-        <td>MAP &lte; for 1% age</td>
-        <td>MAP &lte; for 5% age</td>
-        <td>MAP &gte; for 10% age</td>
-        <td>MAP = 50% age</td>
-    </table>`
 
   header = (t) => {
     return (
