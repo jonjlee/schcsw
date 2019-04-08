@@ -1,27 +1,21 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, ScrollView, Text, Switch } from 'react-native'
-import { theme } from '../../theme'
-import HTML from 'react-native-render-html';
+import createStyles, { padding, fonts, theme } from '../../theme'
+import { HTML, Footer } from '../../common-components';
 
 class SepsisCalcScreen extends Component {
-  static navigationOptions = ({ navigation, navigationOptions }) => {
+  static navigationOptions = ({ navigation }) => {
     return {
       title: '',
       headerLeft: null,
       headerRight: (
-        <Text
-          style={ styles.header }
-          onPress={() => { navigation.pop() }}>
-            Done
+        <Text style={ styles.headerText } onPress={() => { navigation.pop() }}>
+          Done
         </Text>
       )
     }
   };
   
-  static descriptionHtml = `
-    <div><h4>Sepsis Score Calculator</h4></div>
-    <p>Adapted from the Pediatric septic shock collaborative patient identification tool. Currently validated for ED use only</p>`
-    
   constructor(props) {
     super(props);
     
@@ -53,11 +47,13 @@ class SepsisCalcScreen extends Component {
     const score = this.state.highRisk + this.state.vitalsAbnl + this.state.capRefillAbnl + this.state.mentalStatusAbnl + this.state.hrAbnl + this.state.skinAbnl;
     return (
       <View style={ styles.container }>
-        <ScrollView contentContainerStyle={ styles.contentContainer }>
-          <HTML
-            tagsStyles={ tagsStyles }
-            baseFontStyle={{ fontSize: 16 }}
-            html={ SepsisCalcScreen.descriptionHtml } />
+        <ScrollView>
+          <HTML>
+            {`
+              <div class="centered"><h4>Sepsis Score Calculator</h4></div>
+              <p>Adapted from the Pediatric septic shock collaborative patient identification tool. Currently validated for ED use only.</p>
+            `}
+          </HTML>
   
           <View style={ styles.optionsContainer }>
             { this.renderOption('High risk condition (immunocompromised/central line)', 'highRisk') }
@@ -68,7 +64,7 @@ class SepsisCalcScreen extends Component {
             { this.renderOption('Abnormal skin exam', 'skinAbnl') }
           </View>
         </ScrollView>
-        <View style={ styles.footer }>
+        <View style={ styles.centeredFooter }>
           <Text style={ styles.scoreText }>Sepsis Score: { score }</Text>
         </View>
       </View>
@@ -76,29 +72,15 @@ class SepsisCalcScreen extends Component {
   }
 }
 
-const styles = StyleSheet.create({
-  header: {
-    marginRight: 12,
-    color: '#ffffff',
-    fontSize: 18
-  },
-  container: {
-    flex: 1,
-  },
-  contentContainer: {
-    flex: 1,
-    alignItems: 'stretch',
-    padding: 20,
-  },
-  footer: {
+const styles = createStyles({
+  centeredFooter: {
     height: 50,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: theme.footer,
   },
   optionsContainer: {
-    paddingHorizontal: 5,
-    paddingVertical: 10
+    padding: padding.sm,
   },
   optionRow: {
     flexDirection: 'row',
@@ -106,9 +88,9 @@ const styles = StyleSheet.create({
     height: 55
   },
   optionText: {
-    paddingRight: 10,
+    paddingRight: padding.sm,
     flex: 4,
-    fontSize: 16,
+    fontSize: fonts.md,
     color: theme.text,
   },
   optionValContainer: {
@@ -118,24 +100,13 @@ const styles = StyleSheet.create({
   },
   optionVal: {
     flex: 1,
-    transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }]
+    transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }]
   },
   scoreText: {
-    fontSize: 18,
+    fontSize: fonts.lg,
     fontWeight: 'bold',
     color: 'white'
   }
 });
-
-const tagsStyles = {
-  div: {
-    textAlign: 'center'
-  },
-  h4: {
-    marginTop: 0,
-    paddingBottom: 5,
-    fontSize: 18,
-  }
-};
 
 export default SepsisCalcScreen;

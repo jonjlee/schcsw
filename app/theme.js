@@ -9,7 +9,7 @@ export const palette = {
   error: '#FF5252',       // red
   info: '#2196F3',        // blue
   success: '#4CAF50',     // green
-  warning: '#ffecb3',     // yellow (prev #ffecb3)
+  warning: '#ffecb3',     // yellow
   lightGray: '#eeeeee',
   medGray: '#efebe9',
   darkGray: '#757575',
@@ -84,8 +84,12 @@ const baseStyles = {
 export default function createStyles(overrides = {}) {
   const styles = StyleSheet.create({...baseStyles, ...overrides});
   styles.tagStyles = {
+    div: { },
     h4: { marginTop: 0, paddingTop: 0, paddingBottom: padding.sm, fontSize: fonts.lg },
     li: { padding: 0, margin: 0 },
-  }
+  };
+  styles.htmlClassStyles = {
+    centered: { textAlign: 'center' }
+  };
   return styles;
 }

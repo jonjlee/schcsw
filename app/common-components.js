@@ -36,6 +36,7 @@ export const HTML = (props) => {
       html={ children }
       containerStyle={ styles.section }
       tagsStyles={ styles.tagStyles }
+      classesStyles={ styles.htmlClassStyles }
       baseFontStyle={{ fontSize: fonts.md }}
       { ...rest } />
   );
@@ -69,7 +70,7 @@ export const Spacer = (props) => <View style={ [{ flex: 1}, props.style] } />
 
 export const Footer = (props) => {
   return (
-    <View style={ FooterStyles.container }>
+    <View style={ [FooterStyles.container, props.style] }>
       <Divider style={ FooterStyles.divider } />
       { props.children }
     </View>
