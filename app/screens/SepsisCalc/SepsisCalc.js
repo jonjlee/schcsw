@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, ScrollView, Text, Switch } from 'react-native'
-import { palette } from '../../common-components'
+import { theme } from '../../theme'
 import HTML from 'react-native-render-html';
 
 class SepsisCalcScreen extends Component {
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     height: 50,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: palette.footer
+    backgroundColor: theme.footer,
   },
   optionsContainer: {
     paddingHorizontal: 5,
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     paddingRight: 10,
     flex: 4,
     fontSize: 16,
-    color: palette.text
+    color: theme.text,
   },
   optionValContainer: {
     flex: 1,
@@ -119,11 +119,6 @@ const styles = StyleSheet.create({
   optionVal: {
     flex: 1,
     transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }]
-  },
-  score: {
-    padding: 15,
-    alignItems: 'center',
-    backgroundColor: palette.footer
   },
   scoreText: {
     fontSize: 18,

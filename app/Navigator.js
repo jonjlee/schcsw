@@ -14,24 +14,26 @@ import SepsisAdmitScreen from './screens/SepsisPathway/SepsisAdmitScreen'
 import SepsisCalcScreen from './screens/SepsisCalc';
 import MAPGoalsScreen from './screens/MAPGoals';
 
-// Default nav styles
+// Default styles for navigation header
+import { theme } from './theme';
 const defaultNavigationOptions = {
   headerStyle: {
-    backgroundColor: '#46bed6',
+    backgroundColor: theme.header,
   },
-  headerTintColor: '#ffffff'
-};
-const styles = {
+  headerTintColor: theme.headerText
 };
 
-// Stack for list of pathways
+// Stack navigator for main screen and Settings
 const PathwaysStack = createStackNavigator(
   { PathwaysScreen, SettingsScreen },
   { defaultNavigationOptions });
+  
+// Stack for Septic Shock pathway
 const SepsisPathwayStack = createStackNavigator(
   { SepsisPathwayScreen, SepsisCalcScreen, MAPGoalsScreen, ActivateSepsisPathwayScreen, InitialResusScreen, OngoingResusScreen, FollowupResusScreen, SepsisAdmitScreen },
   { defaultNavigationOptions });
 
+// Main stack to swtich between list of pathways and individual pathways
 const PathwaysNavigator = createSwitchNavigator(
   {
     Pathways: PathwaysStack,
@@ -41,5 +43,6 @@ const PathwaysNavigator = createSwitchNavigator(
     initialRouteName: 'Pathways',
   });
 
+// Used in App.js as main entry point
 const Navigator = PathwaysNavigator;
 export default Navigator;

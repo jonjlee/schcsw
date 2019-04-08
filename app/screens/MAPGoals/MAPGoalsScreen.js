@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, ScrollView, Text } from 'react-native'
-import { palette } from '../../common-components'
+import { theme } from '../../theme'
 
 class MAPGoalsScreen extends Component {
   static navigationOptions = ({ navigation, navigationOptions }) => {

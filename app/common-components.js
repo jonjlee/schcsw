@@ -1,9 +1,48 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Icon, Divider } from 'react-native-elements';
+import { withNavigation } from 'react-navigation';
+import { Button as RNEButton, Icon, Divider } from 'react-native-elements';
+import RNRenderHTML from 'react-native-render-html';
+import createStyles, { theme, palette, fonts } from './theme';
+
+const styles = createStyles();
+
+// A button styled with our theme colors
+export const Button = (props) => {
+  return (
+    <RNEButton
+      buttonStyle={ styles.button }
+      {...props} />
+  );
+};
+
+// Button that navigates to a given route when clicked
+class LinkButtonComponent extends Component {
+  render() {
+    const { target, navigation, ...rest } = this.props;
+    return (
+      <Button
+        onPress={ () => navigation.navigate(target) }
+        {...rest} />
+    );
+  }
+};
+export const LinkButton = withNavigation(LinkButtonComponent);
+
+export const HTML = (props) => {
+  const { children, ...rest } = props;
+  return (
+    <RNRenderHTML
+      html={ children }
+      containerStyle={ styles.section }
+      tagsStyles={ styles.tagStyles }
+      baseFontStyle={{ fontSize: fonts.md }}
+      { ...rest } />
+  );
+}
 
 export const WarnText = (props) => {
-  const iconColor = props.iconColor || palette.hilite;
+  const iconColor = props.iconColor || 'white';
   return (
     <View style={ [WarnTextStyles.container, props.containerStyle] }>
       <View style={ [WarnTextStyles.iconContainer, props.iconContainerStyle] }>
@@ -20,7 +59,7 @@ export const WarnText = (props) => {
 
 export const ErrText = (props) => {
   return (
-    <WarnText containerStyle={{ backgroundColor: 'coral' }} style={{ color: 'white' }}>
+    <WarnText containerStyle={{ backgroundColor: theme.errBackground }} style={{ color: theme.errText }}>
       { props.children }
     </WarnText>
   )
@@ -37,16 +76,28 @@ export const Footer = (props) => {
   );
 }
 
-export const palette = {
-  background: '#FFFAFF',  // near white
-  header: '#30BCED',      // blue
-  footer: '#30BCED',
-  text: '#050401',        // dark gray
-  gray: '#6E6E7A',        // medium gray
-  lightGray: '#BCBCBC',
-  warn: '#fffaaa',        // yellow
-  hilite: '#ffffff',
-};
+export const PathwayHeader = (navigation, title, props = {}) => {
+  return {
+    title,
+    headerRight: (
+      <Text style={ styles.headerText } onPress={() => { navigation.navigate('Pathways') }}>
+        Exit
+      </Text>
+    ),
+    ...props,
+  }
+}
+
+// export const palette = {
+//   background: '#FFFAFF',  // near white
+//   header: '#30BCED',      // blue
+//   footer: '#30BCED',
+//   text: '#050401',        // dark gray
+//   gray: '#6E6E7A',        // medium gray
+//   lightGray: '#BCBCBC',
+//   warn: '#fffaaa',        // yellow
+//   hilite: '#ffffff',
+// };
 
 const WarnTextStyles = StyleSheet.create({
   container: {
@@ -56,8 +107,8 @@ const WarnTextStyles = StyleSheet.create({
     marginLeft: 5,
     marginRight: 5,
     borderWidth: 3,
-    borderColor: '#ffffff',
-    backgroundColor: palette.warn,
+    borderColor: 'white',
+    backgroundColor: palette.warning,
   },
   iconContainer: {
     flex: 1,
@@ -72,7 +123,7 @@ const WarnTextStyles = StyleSheet.create({
     margin: 18,
   },
   text: {
-    color: palette.gray
+    color: palette.darkGray
   }
 });
 
