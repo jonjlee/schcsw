@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 18,
+    fontSize: theme.fontSizeLg,
     fontWeight: 'bold',
     paddingBottom: 20,
   },
@@ -185,7 +185,7 @@ const tagsStyles = {
   h4: {
     marginTop: 0,
     paddingBottom: 5,
-    fontSize: 18,
+    fontSize: theme.fontSizeLg,
   }
 };
 

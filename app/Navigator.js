@@ -5,12 +5,7 @@ import { createStackNavigator, createSwitchNavigator } from 'react-navigation';
 // Screens
 import SettingsScreen from './screens/Settings';
 import PathwaysScreen from './screens/Pathways';
-import SepsisPathwayScreen from './screens/SepsisPathway';
-import ActivateSepsisPathwayScreen from './screens/SepsisPathway/ActivateSepsisPathwayScreen'
-import InitialResusScreen from './screens/SepsisPathway/InitialResusScreen'
-import OngoingResusScreen from './screens/SepsisPathway/OngoingResusScreen'
-import FollowupResusScreen from './screens/SepsisPathway/FollowupResusScreen'
-import SepsisAdmitScreen from './screens/SepsisPathway/SepsisAdmitScreen'
+import { ActivateSepsisPathwayScreen, FollowupResusScreen, InitialResusScreen, OngoingResusScreen, SepsisAdmitScreen, SepsisPathwayScreen } from './screens/SepsisPathway';
 import SepsisCalcScreen from './screens/SepsisCalc';
 import MAPGoalsScreen from './screens/MAPGoals';
 

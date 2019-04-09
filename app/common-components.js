@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import { Button as RNEButton, Icon, Divider } from 'react-native-elements';
 import RNRenderHTML from 'react-native-render-html';
-import createStyles, { theme, palette, fonts } from './theme';
+import createStyles, { theme } from './theme';
 
 const styles = createStyles();
 
@@ -37,7 +37,7 @@ export const HTML = (props) => {
       containerStyle={ styles.section }
       tagsStyles={ styles.tagStyles }
       classesStyles={ styles.htmlClassStyles }
-      baseFontStyle={{ fontSize: fonts.md }}
+      baseFontStyle={{ fontSize: theme.fontSizeMd }}
       { ...rest } />
   );
 }
@@ -89,17 +89,6 @@ export const PathwayHeader = (navigation, title, props = {}) => {
   }
 }
 
-// export const palette = {
-//   background: '#FFFAFF',  // near white
-//   header: '#30BCED',      // blue
-//   footer: '#30BCED',
-//   text: '#050401',        // dark gray
-//   gray: '#6E6E7A',        // medium gray
-//   lightGray: '#BCBCBC',
-//   warn: '#fffaaa',        // yellow
-//   hilite: '#ffffff',
-// };
-
 const WarnTextStyles = StyleSheet.create({
   container: {
     flexDirection: 'row',
@@ -109,7 +98,7 @@ const WarnTextStyles = StyleSheet.create({
     marginRight: 5,
     borderWidth: 3,
     borderColor: 'white',
-    backgroundColor: palette.warning,
+    backgroundColor: theme.warnBackground,
   },
   iconContainer: {
     flex: 1,
@@ -124,7 +113,7 @@ const WarnTextStyles = StyleSheet.create({
     margin: 18,
   },
   text: {
-    color: palette.darkGray
+    color: theme.warnText
   }
 });
 
@@ -135,7 +124,7 @@ const FooterStyles = StyleSheet.create({
   },
   divider: {
     marginBottom: 10,
-    height:1,
-    backgroundColor: palette.lightGray,
+    height: 1,
+    backgroundColor: theme.divider,
   },
 });

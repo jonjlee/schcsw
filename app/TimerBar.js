@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Icon } from 'react-native-elements';
-import { palette } from './theme'
+import { theme } from './theme'
 
 class TimerBar extends Component {
   constructor(props) {
@@ -69,10 +69,10 @@ const styles = StyleSheet.create({
     width: 35,
   },
   greenIcon: {
-    backgroundColor: 'limegreen'
+    backgroundColor: theme.okBackground,
   },
   redIcon: {
-    backgroundColor: 'tomato'
+    backgroundColor: theme.errBackground,
   },
   textContainer: {
     flex: 1,
@@ -82,13 +82,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   timerText: {
-    fontSize: 18,
+    fontSize: theme.fontSizeLg,
   },
   greenText: {
-    color: 'green',
+    color: theme.okTextColored,
   },
   redText: {
-    color: 'firebrick',
+    color: theme.errTextColored,
   },
 });
 
