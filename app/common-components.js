@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text as RNText, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import { Button as RNEButton, Icon, Divider } from 'react-native-elements';
 import RNRenderHTML from 'react-native-render-html';
@@ -16,6 +16,18 @@ export const Button = (props) => {
   );
 };
 
+// Text styled with default font
+export const Text = (props) => {
+  const { children, style, ...rest } = props;
+  return (
+    <RNText
+      style={ [{ fontSize: theme.fontSizeMd, color: theme.text}, style] }
+      {...rest } >
+        { children }
+    </RNText>
+  );
+}
+
 // Button that navigates to a given route when clicked
 class LinkButtonComponent extends Component {
   render() {
@@ -29,6 +41,35 @@ class LinkButtonComponent extends Component {
 };
 export const LinkButton = withNavigation(LinkButtonComponent);
 
+// A centered bolded Text element
+export const SectionHead = (props) => (
+  <View style={{ flex: 1, alignItems: 'center' }}>
+    <Text style={{ fontSize: theme.fontSizeLg }}>{ props.children }</Text>
+  </View>
+);
+
+// Text preceded by a bullet icon
+export const Bullet = (props) => {
+  const bullet = '\u2022';
+  const bulletWidth = 15;
+  return (
+    <View style={{ flexDirection: 'row' }}>
+      <View style={{ width: bulletWidth }}>
+        <RNText style={{ fontSize: theme.fontSizeLg }}>
+          { bullet + ' ' }
+        </RNText>
+      </View>
+      <View style={{ flex: 1 }}>
+        <RNText style={{ fontSize: theme.fontSizeMd }}>
+          { props.children }
+        </RNText>
+      </View>
+    </View>
+  );
+}
+
+// Encapsulated HTML component from react-native-render-html with the app's
+// styles. Also allow html content to be sepcified as the component's children.
 export const HTML = (props) => {
   const { children, ...rest } = props;
   return (
@@ -42,6 +83,7 @@ export const HTML = (props) => {
   );
 }
 
+// Yellow colored, outlined, text box with an icon
 export const WarnText = (props) => {
   const iconColor = props.iconColor || 'white';
   return (
@@ -50,14 +92,15 @@ export const WarnText = (props) => {
         <Icon type='font-awesome' name='warning' size={ 36 } color={ iconColor } />
       </View>
       <View style={ WarnTextStyles.textContainer }>
-        <Text style={ [WarnTextStyles.text, props.style] }>
+        <RNText style={ [WarnTextStyles.text, props.style] }>
           { props.children }
-        </Text>
+        </RNText>
       </View>
     </View>
   );
 };
 
+// Red colored, outlined, text box with an icon
 export const ErrText = (props) => {
   return (
     <WarnText containerStyle={{ backgroundColor: theme.errBackground }} style={{ color: theme.errText }}>
@@ -66,8 +109,10 @@ export const ErrText = (props) => {
   )
 };
 
+// Empty View to fill remaining vertical space if flex container
 export const Spacer = (props) => <View style={ [{ flex: 1}, props.style] } />
 
+// Footer with a divider line
 export const Footer = (props) => {
   return (
     <View style={ [FooterStyles.container, props.style] }>
@@ -77,13 +122,15 @@ export const Footer = (props) => {
   );
 }
 
+
+
 export const PathwayHeader = (navigation, title, props = {}) => {
   return {
     title,
     headerRight: (
-      <Text style={ styles.headerText } onPress={() => { navigation.navigate('Pathways') }}>
+      <RNText style={ styles.headerText } onPress={() => { navigation.navigate('Pathways') }}>
         Exit
-      </Text>
+      </RNText>
     ),
     ...props,
   }

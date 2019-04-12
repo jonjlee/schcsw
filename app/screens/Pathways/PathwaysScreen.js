@@ -25,13 +25,15 @@ class PathwaysScreen extends Component {
       pathways: [
         {
           name: 'Asthma',
+          screen: 'Asthma',
+          params: {},
         },
         {
           name: 'Croup',
         },
         {
           name: 'Septic Shock',
-          screen: 'SepsisPathwayScreen',
+          screen: 'Sepsis',
           params: {}
         }
       ]

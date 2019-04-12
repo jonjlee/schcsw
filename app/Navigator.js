@@ -8,6 +8,7 @@ import PathwaysScreen from './screens/Pathways';
 import { ActivateSepsisPathwayScreen, FollowupResusScreen, InitialResusScreen, OngoingResusScreen, SepsisAdmitScreen, SepsisPathwayScreen } from './screens/SepsisPathway';
 import SepsisCalcScreen from './screens/SepsisCalc';
 import MAPGoalsScreen from './screens/MAPGoals';
+import { AsthmaPathwayScreen } from './screens/AsthmaPathway';
 
 // Default styles for navigation header
 import { theme } from './theme';
@@ -23,9 +24,12 @@ const PathwaysStack = createStackNavigator(
   { PathwaysScreen, SettingsScreen },
   { defaultNavigationOptions });
   
-// Stack for Septic Shock pathway
+// Stack for specific pathway
 const SepsisPathwayStack = createStackNavigator(
   { SepsisPathwayScreen, SepsisCalcScreen, MAPGoalsScreen, ActivateSepsisPathwayScreen, InitialResusScreen, OngoingResusScreen, FollowupResusScreen, SepsisAdmitScreen },
+  { defaultNavigationOptions });
+const AsthmaPathwayStack = createStackNavigator(
+  { AsthmaPathwayScreen },
   { defaultNavigationOptions });
 
 // Main stack to swtich between list of pathways and individual pathways
@@ -33,6 +37,7 @@ const PathwaysNavigator = createSwitchNavigator(
   {
     Pathways: PathwaysStack,
     Sepsis: SepsisPathwayStack,
+    Asthma: AsthmaPathwayStack,
   },
   {
     initialRouteName: 'Pathways',

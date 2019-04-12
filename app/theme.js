@@ -30,7 +30,7 @@ export const palette = {
   ok4: 'hsl(144,100%,27.75%)',
   ok5: 'hsl(144,100%,32%)',
   ok6: 'hsl(144,100%,46.5%)',
-  ok7: 'hsl(144,100%,61%)',
+  ok7: 'hsl(144,45%,73%)',
   ok8: 'hsl(144,100%,75.5%)',
   ok9: 'hsl(144,100%,90%)',
   warn1: 'hsl(63,71%,15%)',
@@ -69,18 +69,29 @@ export const theme = {
   headerText: 'white',
   footer: palette.primary5,
   footerText: 'white',
-  button: palette.primary5,
-  text: palette.grey1,
   okBackground: palette.ok5,
-  okText: palette.grey2,
+  okBorder: palette.ok2,
+  okHighlight: palette.ok7,
+  okText: palette.grey8,
   okTextColored: palette.ok4,
   warnBackground: palette.warn6,
+  warnBorder: palette.warn2,
+  warnHighlight: palette.warn7,
   warnText: palette.grey2,
+  warnTextColored: palette.warn2,
   errBackground: palette.err5,
+  errBorder: palette.err2,
+  errHighlight: 'white',
   errText: 'white',
   errTextColored: palette.err5,
+  greyText: palette.grey5,
+  button: palette.primary5,
+  secondaryButton: palette.secondary5,
+  text: palette.grey1,
+  phaseHeader: palette.secondary5,
   tableHeaderBackground: palette.primary6,
   tableHeaderText: palette.grey1,
+  linkText: palette.primary3,
   divider: palette.grey5,
   
   // Padding sizes
@@ -123,6 +134,10 @@ const baseStyles = {
   },
   footerButton: {
     paddingVertical: theme.paddingSm,
+  },
+  linkText: {
+    color: theme.linkText,
+    textDecorationLine: 'underline',
   }
 }
 
