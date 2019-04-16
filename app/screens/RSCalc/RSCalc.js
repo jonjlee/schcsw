@@ -6,6 +6,8 @@ import createStyles, { theme } from '../../theme';
 
 class RSCalcScreen extends Component {
   static navigationOptions = ({ navigation }) => {
+    
+    // Handler for pressing Accept in header
     const onAccept = () => {
       // Send selected options and total respiratory score
       const parentOnAccept = navigation.getParam('onAccept');
@@ -14,6 +16,7 @@ class RSCalcScreen extends Component {
         parentOnAccept(data);
       }
       
+      // Go back to prev view
       navigation.pop();
     };
     
@@ -26,7 +29,7 @@ class RSCalcScreen extends Component {
   constructor(props) {
     super(props);
 
-    // Load state from navigation param
+    // Load state from navigation params, not props, since screen loaded by navigate()
     const data = this.props.navigation.getParam('data');
     this.state = {
       selectedAge: data.selectedAge || 0,
@@ -54,7 +57,6 @@ class RSCalcScreen extends Component {
   
   getRROpts = () => {
     // Return corresponding respiratory rates for the selected age group
-    console.log(JSON.stringify(this.state))
     const { selectedAge } =  this.state;
     const RRlt2mo = ['≤60', '61-90', '≥70'];
     const RR2moto12mo = ['≤50', '51-59', '≥60'];
@@ -102,16 +104,17 @@ class RSCalcScreen extends Component {
   // Represents one question with options. Creates a View with a title (e.g. Respiratory Rate:) and a group of option buttons.
   renderItem = (key, title, options, stateEl) => {
     
-    // <Button> element that represents a single option which may be selected
+    // <Button> element that represents an option that can be selected by clicking on it
     const getOption = (title, i) => {
       
-      // Highlight element if selected
+      // Background color, white text, and border if selected
       const selected = (i==this.state[stateEl]);
       const titleStyle = selected ? styles.itemSelectedTitle : styles.itemTitle;
       const buttonStyle = selected ? styles.itemSelectedButton : styles.itemButton;
       
       // Top border on all except first element (since container has borders)
       const borderStyle = { borderTopWidth: (i>0) ? 1 : 0 }
+      
       return (
         <Button
           key={ i }
@@ -119,7 +122,7 @@ class RSCalcScreen extends Component {
           titleStyle={ titleStyle }
           title={ title }
           onPress={ () => {
-            // Add selected option to state. When state update done, sync navigation state to match so it can be passed back to parent view
+            // Add selected option to state. When state update done, sync navigation params to match so it can be passed back to parent view
             this.setState(
               {[stateEl]: i},
               () => this.updateNavigation());
@@ -141,12 +144,14 @@ class RSCalcScreen extends Component {
   }
 
   render() {
+    // Define text all the various options
     const ageOpts = ['<2mo', '2-12mo', '1-2yr', '2-3yr', '4-5yr', '6-12yr', '>12yr'];
     const rrOpts = this.getRROpts();
     const retractionsOpts = ['None', 'Subcostal or intercostal', '2 of the following: subcostal, intercostal, substernal, OR nasal flaring (infant)', '3 of the following: subcostal, intercostal, substernal, suprasternal, supraclavicular OR nasal flaring / head bobbing (infant)'];
     const dyspneaOpts = this.getDyspneaOpts();
     const auscultationOpts = ['Normal breathing, no wheezing present', 'End-expiratory wheeze only', 'Expiratory wheeze only (greater than end-expiratory wheeze)', 'Inspiratory and expiratory wheeze OR diminished breath sounds OR both'];
     
+    // Create title, description text, ScrollView containing all items, and footer with total respiratory score
     return (
       <View style={ styles.container }>
         <ScrollView>

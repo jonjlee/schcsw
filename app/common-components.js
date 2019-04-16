@@ -44,7 +44,7 @@ export const LinkButton = withNavigation(LinkButtonComponent);
 // A centered bolded Text element
 export const SectionHead = (props) => (
   <View style={{ flex: 1, alignItems: 'center' }}>
-    <Text style={{ fontSize: theme.fontSizeLg }}>{ props.children }</Text>
+    <Text style={ [{ fontSize: theme.fontSizeLg }, props.style] }>{ props.children }</Text>
   </View>
 );
 
@@ -52,15 +52,16 @@ export const SectionHead = (props) => (
 export const Bullet = (props) => {
   const bullet = '\u2022';
   const bulletWidth = 15;
+  const { style, ...rest } = props;
   return (
     <View style={{ flexDirection: 'row' }}>
       <View style={{ width: bulletWidth }}>
-        <RNText style={{ fontSize: theme.fontSizeLg }}>
+        <RNText style={ [{ fontSize: theme.fontSizeLg }, style] }>
           { bullet + ' ' }
         </RNText>
       </View>
       <View style={{ flex: 1 }}>
-        <RNText style={{ fontSize: theme.fontSizeMd }}>
+        <RNText style={ [{ fontSize: theme.fontSizeMd }, style] }>
           { props.children }
         </RNText>
       </View>

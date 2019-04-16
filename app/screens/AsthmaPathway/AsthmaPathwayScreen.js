@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, ScrollView } from 'react-native';
+import { withNavigation } from 'react-navigation';
 import { Card, Slider, Icon } from 'react-native-elements';
 import { PathwayHeader, SectionHead, Bullet, Button, Text, WarnText } from '../../common-components.js';
 import TimerBar from '../../TimerBar';
@@ -12,12 +13,11 @@ class AsthmaPathwayScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      RS0Hour: {score: 0},
-      RS1Hour: {score: 0},
-      RS2Hour: {score: 0},
-      RS3Hour: {score: 0},
-      RS4Hour: {score: 0},
-      timer0State: 0,
+      RS0Hour: {score: 1},
+      RS1Hour: {score: 1},
+      RS2Hour: {score: 1},
+      RS3Hour: {score: 1},
+      RS4Hour: {score: 1},
       activePhase: 0,
     }
     
@@ -25,18 +25,32 @@ class AsthmaPathwayScreen extends Component {
     this.setRS = debounce(this.setState, 20);
   }
   
-  render() {
-    const headerColor0Hour = this.state.timer0State == 2 ? theme.greyText : theme.phaseHeader;
-    const color0Hour = this.state.timer0State == 2 ? theme.greyText : theme.text;
+  renderPhase0 = () => {
+    const greyIfCompleted = this.state.activePhase > 0 ? { color: theme.greyText } : null;
 
+    // Phase 0: give O2 and exclusion criteria
+    return (
+      <Card key={0} title="TRIAGE" titleStyle={ [styles.phaseHeader, greyIfCompleted] }>
+        <Bullet style={ greyIfCompleted }>Administer supplemental 02 to keep saturation > 90%</Bullet>
+        <Bullet style={ greyIfCompleted }>
+          <Text style={ [{ fontWeight: 'bold', color: theme.warnTextColored }, greyIfCompleted] }>Exclude</Text><Text style={ greyIfCompleted }>: other primary diagnoses, e.g. PNA, bronchiolitis, croup</Text>
+        </Bullet>
+        <Bullet style={ greyIfCompleted }>
+          <Text style={ [{ fontWeight: 'bold', color: theme.warnTextColored }, greyIfCompleted] }>Exclude</Text><Text style={ greyIfCompleted }>: chronic conditions, e.g. cystic fibrosis, restrictive lung disease, BPD, cardiac diseases, airway issues (vocal cord paralysis, tracheomalacia, trach dependent), medically complex children, immune disorders, sickle cell</Text>
+        </Bullet>
+      </Card>
+    );
+  }
+  
+  renderGenericPhase = ({ phase, title, rsLabel, score, rsStateVar, bulletsTitle, bullets, active, completed }) => {
     // The "RS Calculator" button
     const RSCalcButton = (props) =>
       <View style={ styles.RSCalcButtonContainer }>
         <Button
           title="Respiratory Score Calculator"
-          buttonStyle={ styles.RSCalcButton }
+          buttonStyle={ [styles.RSCalcButton, props.style] }
           titleStyle={ styles.RSCalcButtonTitle }
-          onPress={ ()=>this.props.navigation.navigate(
+          onPress={ () => this.props.navigation.navigate(
             'RSCalcScreen',
             {
               // Initialize calculator with current data from our state
@@ -49,184 +63,218 @@ class AsthmaPathwayScreen extends Component {
           }
         />
       </View>
+
+    const greyIfCompleted = completed ? { color: theme.greyText } : null;
+    const backgroundGreyIfCompleted = completed ? { backgroundColor: theme.greyText } : null;
     
+    return (
+      <Card key={phase} title={ title } titleStyle={ [styles.phaseHeader, greyIfCompleted] }>
+        <Card containerStyle={ styles.phaseCard }>
+
+          { /* Respiratory score label and slider */ }
+          <View>
+            <View style={ styles.labelContainer }>
+              <Text style={ greyIfCompleted }>{ rsLabel + ': ' + score }</Text>
+            </View>
+            <View style={ styles.controlContainer }>
+              { /* Minimum value label */ }
+              <Text style={ greyIfCompleted }>1</Text>
+              { /* Slider control */ }
+              <View style={ styles.sliderContainer }>
+                <Slider
+                  minimumValue={1} maximumValue={12} step={1}
+                  thumbTintColor={ completed ? theme.greyText : theme.button }
+                  value={ score }
+                  onValueChange={ v => this.setState({ [rsStateVar]: {score: v} }) }/>
+              </View>
+              { /* Max value label */ }
+              <Text style={ greyIfCompleted }>12</Text>
+            </View>
+          </View>
+
+          { /* RS Calculator button */ }
+          <RSCalcButton style={ backgroundGreyIfCompleted } stateVar={ rsStateVar } />
+        </Card>
+        
+        { /* Actions to perform given RS */ }
+        <Card title={ bulletsTitle } containerStyle={ styles.phaseCard } >
+          {
+            bullets.map((text, i) => <Bullet key={i} style={ greyIfCompleted }>{ text }</Bullet>)
+          }
+        </Card>
+
+        { /* Start Timer button or timer bar */ }
+        <View style={{ alignItems: 'stretch', marginTop: 10 }}>
+          {
+            active ?
+              <TimerBar duration={ 20 } /> :
+            !completed ?
+              <Button title="Start 60 Minute Timer" onPress={ () => this.setState({ activePhase: phase }) } /> :
+              null
+          }
+        </View>
+      </Card>
+    );
+  }
+  
+  renderPhase1 = () => {
+    const phase = 1;
+    const phaseVisible = (this.state.activePhase >= (phase-1));
+    if (!phaseVisible) {
+      return null;
+    }
+    
+    let bulletsTitle = null;
+    let bullets = null;
+    if (this.state.RS0Hour.score <= 5) {
+      bulletsTitle = 'RS 1 to 5';
+      bullets = ['Albuterol MDI 8 puffs',
+        'Dexamethasone 0.6 mg/kg x1 (16mg max)',
+        'Rescore after 60 minutes'];
+    } else if (this.state.RS0Hour.score <= 9) {
+      bulletsTitle = 'RS 6 to 9';
+      bullets = ['Albuterol continuous neb 20 mg x 1hr',
+        'Ipratroprium neb 1.5 mg (0.75 mg for <2 yo)',
+        'Dexamethasone 0.6 mg/kg x1 (16 mg max)',
+        'Rescore after 60 minutes'];
+    } else {
+      bulletsTitle = 'RS 10 to 12';
+      bullets = ['Albuterol continuous neb 20 mg x 1hr',
+        'Ipratropium neb 1.5 mg (0.75 mg for <2 yo)',
+        'Dexamethasone 0.6 mg/kg x1 (16 mg max)',
+        'Magnesium Sulfate IV 50 mg/kg x1 (max 2 grams) for age >2 yo',
+        'Rescore after 60 minutes'];
+    }
+    
+    return this.renderGenericPhase({
+      phase: phase,
+      title: 'INITIATION',
+      rsLabel: 'Respiratory Score on Arrival',
+      score: this.state['RS0Hour'].score,
+      rsStateVar: 'RS0Hour',
+      bulletsTitle: bulletsTitle,
+      bullets: bullets,
+      active: (this.state.activePhase === phase),
+      completed: (this.state.activePhase > phase)
+    });
+  }
+  
+  renderPhase2 = () => {
+    const phase = 2;
+    const phaseVisible = (this.state.activePhase >= (phase-1));
+    if (!phaseVisible) {
+      return null;
+    }
+
+    let bulletsTitle = null;
+    let bullets = null;
+    if (this.state.RS1Hour.score <= 4) {
+      bulletsTitle = 'RS 1 to 4';
+      bullets = ['If first hour RS 1-5, discharge', 'If first hour RS 6-9, observe for 1 hour', 'If first hour RS 10-12, observe for 2 hours', 'Rescore after 60 minutes'];
+    } else if (this.state.RS1Hour.score <= 9) {
+      bulletsTitle = 'RS 5 to 9';
+      bullets = ['Albuterol MDI 8 puffs', 'Rescore after 60 minutes'];
+    } else {
+      bulletsTitle = 'RS 10 to 12';
+      bullets = ['Albuterol continuous neb 20 mg/hr', 'Ipratroprium neb 1.5 mg (0.75 mg for <2 yo)- if not already given', 'Magnesium Sulfate IV 50 mg/kg x1 (max 2 grams) for age ≥ 2 y.o- if not already given', 'Place bed request', 'Rescore after 60 minutes'];
+    }
+    
+    return this.renderGenericPhase({
+      phase: phase,
+      title: 'AFTER 1 HOUR',
+      rsLabel: 'Respiratory Score After 1 Hour',
+      score: this.state['RS1Hour'].score,
+      rsStateVar: 'RS1Hour',
+      bulletsTitle: bulletsTitle,
+      bullets: bullets,
+      active: (this.state.activePhase === phase),
+      completed: (this.state.activePhase > phase)
+    });
+  }
+  
+  renderPhase3 = () => {
+    const phase = 3;
+    const phaseVisible = (this.state.activePhase >= (phase-1));
+    if (!phaseVisible) {
+      return null;
+    }
+
+    let bulletsTitle = null;
+    let bullets = null;
+    if (this.state.RS2Hour.score <= 4) {
+      bulletsTitle = 'RS 1 to 4';
+      bullets = ['Discharge', 'RS 1-4 for minimum of 1 hour', '(Patients with an initial RS of 10-12 should be observed for 2 hours prior to discharge)', 'Shared decision making in hour 3 for RS 5-8', 'Tolerating oral intake', 'Adequate family teaching', 'Follow-up established'];
+    } else if (this.state.RS2Hour.score <= 8) {
+      bulletsTitle = 'RS 5 to 8';
+      bullets = ['Albuterol MDI 8 puffs',
+        'Give ipratropium neb 1.5 mg (0.75 mg for <2 yo) if not given',
+        'Determine disposition',
+        'Rescore after 60 minutes'];
+    } else {
+      bulletsTitle = 'RS 9 to 12';
+      bullets = ['ICU Consult for RS 10-12', 'Albuterol continuous neb 20 mg/hr', 'Manesium Sulfate IV 50 mg/kg x1 (max 2 grams) for age ≥ 2 y.o. if not given', 'Admit to Inpatient / ICU', 'If undecided on Inpatient or ICU, move on to 4th hour', 'Rescore after 60 minutes'];
+    }
+    
+    return this.renderGenericPhase({
+      phase: phase,
+      title: 'AFTER 2 HOURS',
+      rsLabel: 'Respiratory Score After 2 Hours',
+      score: this.state['RS2Hour'].score,
+      rsStateVar: 'RS2Hour',
+      bulletsTitle: bulletsTitle,
+      bullets: bullets,
+      active: (this.state.activePhase === phase),
+      completed: (this.state.activePhase > phase)
+    });
+  }
+  
+  renderPhase4 = () => {
+    const phase = 4;
+    const phaseVisible = (this.state.activePhase >= (phase-1));
+    if (!phaseVisible) {
+      return null;
+    }
+
+    let bulletsTitle = null;
+    let bullets = null;
+    if (this.state.RS3Hour.score <= 8) {
+      bulletsTitle = 'RS 1 to 8';
+      bullets = ['Determine disposition'];
+    } else if (this.state.RS3Hour.score <= 10) {
+      bulletsTitle = 'RS 9 to 10';
+      bullets = ['Albuterol continuous neb 20 mg/hr x 1 hr',
+        'Rescore after 60 minutes',
+        'Huddle with: Floor Charge Nurse, Floor Team, and consider ICU consult (if not already done)',
+        'Admit to inpatient or ICU'];
+    } else {
+      bulletsTitle = 'RS 11 to 12';
+      bullets = ['Admit to ICU'];
+    }
+    
+    return this.renderGenericPhase({
+      phase: phase,
+      title: 'AFTER 3 HOURS',
+      rsLabel: 'Respiratory Score After 3 Hours',
+      score: this.state['RS3Hour'].score,
+      rsStateVar: 'RS3Hour',
+      bulletsTitle: bulletsTitle,
+      bullets: bullets,
+      active: (this.state.activePhase === phase),
+      completed: (this.state.activePhase > phase)
+    });
+  }
+  
+  render() {
     return (
       <View style={ styles.container }>
         <ScrollView>
-          <Card title="TRIAGE" titleStyle={ styles.phaseHeader }>
-            <Bullet>Administer supplemental 02 to keep saturation > 90%</Bullet>
-            <Bullet>
-              <Text style={{ fontWeight: 'bold', color: theme.warnTextColored }}>Exclude</Text><Text>: other primary diagnoses, e.g. PNA, bronchiolitis, croup</Text>
-            </Bullet>
-            <Bullet>
-              <Text style={{ fontWeight: 'bold', color: theme.warnTextColored }}>Exclude</Text><Text>: chronic conditions, e.g. cystic fibrosis, restrictive lung disease, BPD, cardiac diseases, airway issues (vocal cord paralysis, tracheomalacia, trach dependent), medically complex children, immune disorders, sickle cell</Text>
-            </Bullet>
-          </Card>
-          <Card title="INITIATION" titleStyle={ [styles.phaseHeader, { color: headerColor0Hour }] }>
-            <Card containerStyle={ [styles.phaseCard, {marginTop: 0}] }>
-              <View>
-                <View style={ styles.labelContainer }>
-                  <Text>Respiratory Score on Arrival: { this.state.RS0Hour.score }</Text>
-                </View>
-                <View style={ styles.controlContainer }>
-                  <Text>0</Text>
-                  <View style={ styles.sliderContainer }>
-                    <Slider
-                      minimumValue={0} maximumValue={12} step={1}
-                      thumbTintColor={ theme.button }
-                      value={ this.state.RS0Hour.score }
-                      onValueChange={ v => this.setRS({ RS0Hour: {score: v} }) }/>
-                  </View>
-                  <Text>12</Text>
-                </View>
-              </View>
-              <RSCalcButton stateVar="RS0Hour" />
-            </Card>
-            <Card containerStyle={ styles.phaseCard } >
-              <Bullet>Albuterol continuous neb 20mg x 1hr</Bullet>
-              <Bullet>Ipratropium neb 1.5mg</Bullet>
-              <Bullet>Dexamethasone 0.6mg/kg x1 (16mg max)</Bullet>
-              <Bullet>Magnesium Sulfate IV 50mg/kg x1 (2g max) for age > 2yo</Bullet>
-              <Bullet>Rescore after 60 minutes</Bullet>
-            </Card>
-            <View style={{ alignItems: 'stretch', marginTop: 10 }}>
-              {
-                this.state.timer0State == 0 ?
-                  <Button title="Start 60 Minute Timer" onPress={ () => this.setState({ timer0State: 1 }) } /> :
-                  (this.state.timer0State == 1 ?
-                    <TimerBar duration={ 60 * 60 } onDone={ () => this.setState({ timer0State: 2 }) } /> :
-                    <View style={{ flex: 1, alignItems: 'center' }}><Text style={{ fontSize: theme.fontSizeLg, color: theme.errTextColored }}>Continue to next step</Text></View>)
-              }
-            </View>
-          </Card>
-          
-          <Card title="AFTER 1 HOUR" titleStyle={ styles.phaseHeader }>
-            <Card containerStyle={ [styles.phaseCard, {marginTop: 0}] }>
-              <View>
-                <View style={ styles.labelContainer }>
-                  <Text>Respiratory Score After 1 Hour: { this.state.RS1Hour.score }</Text>
-                </View>
-                <View style={ styles.controlContainer }>
-                  <Text>0</Text>
-                  <View style={ styles.sliderContainer }>
-                    <Slider
-                      minimumValue={0} maximumValue={12} step={1}
-                      thumbTintColor={ theme.button }
-                      value={ this.state.RS1Hour.score }
-                      onValueChange={ v => this.setState({ RS1Hour: {score: v} }) }/>
-                  </View>
-                  <Text>12</Text>
-                </View>
-              </View>
-              <RSCalcButton />
-            </Card>
-            <Card title="RS 9-12" containerStyle={ styles.phaseCard } >
-              <Bullet>Albuterol continuous neb 20mg x 1hr</Bullet>
-              <Bullet>Ipratropium neb 1.5mg- if not already given</Bullet>
-              <Bullet>Magnesium Sulfate IV 50mg/kg x1 (2g max) for age > 2yo- if not already given</Bullet>
-              <Bullet>Place bed request</Bullet>
-              <Bullet>Rescore after 60 minutes</Bullet>
-            </Card>
-            <View style={{ alignItems: 'stretch', marginTop: 10 }}>
-              <Button title="Start 60 Minute Timer" />
-            </View>
-          </Card>
-
-          <Card title="AFTER 2 HOURS" titleStyle={ styles.phaseHeader }>
-            <Card containerStyle={ [styles.phaseCard, {marginTop: 0}] }>
-              <View>
-                <View style={ styles.labelContainer }>
-                  <Text>Respiratory Score After 2 Hours: { this.state.RS2Hour.Score }</Text>
-                </View>
-                <View style={ styles.controlContainer }>
-                  <Text>0</Text>
-                  <View style={ styles.sliderContainer }>
-                    <Slider
-                      minimumValue={0} maximumValue={12} step={1}
-                      thumbTintColor={ theme.button }
-                      value={ this.state.RS2Hour.score }
-                      onValueChange={ v => this.setState({ RS2Hour: {score: v} }) }/>
-                  </View>
-                  <Text>12</Text>
-                </View>
-              </View>
-              <RSCalcButton />
-            </Card>
-            <Card title="RS 9-12" containerStyle={ styles.phaseCard } >
-              <Bullet>Albuterol continuous neb 20mg x 1hr</Bullet>
-              <Bullet>Ipratropium neb 1.5mg- if not already given</Bullet>
-              <Bullet>Magnesium Sulfate IV 50mg/kg x1 (2g max) for age > 2yo- if not already given</Bullet>
-              <Bullet>Place bed request</Bullet>
-              <Bullet>Rescore after 60 minutes</Bullet>
-            </Card>
-            <View style={{ alignItems: 'stretch', marginTop: 10 }}>
-              <Button title="Start 60 Minute Timer" />
-            </View>
-          </Card>
-
-          <Card title="AFTER 3 HOURS" titleStyle={ styles.phaseHeader }>
-            <Card containerStyle={ [styles.phaseCard, {marginTop: 0}] }>
-              <View>
-                <View style={ styles.labelContainer }>
-                  <Text>Respiratory Score After 3 Hours: { this.state.RS3Hour.score }</Text>
-                </View>
-                <View style={ styles.controlContainer }>
-                  <Text>0</Text>
-                  <View style={ styles.sliderContainer }>
-                    <Slider
-                      minimumValue={0} maximumValue={12} step={1}
-                      thumbTintColor={ theme.button }
-                      value={ this.state.RS3Hour.score }
-                      onValueChange={ v => this.setState({ RS3Hour: {score: v} }) }/>
-                  </View>
-                  <Text>12</Text>
-                </View>
-              </View>
-              <RSCalcButton />
-            </Card>
-            <Card title="RS 9-12" containerStyle={ styles.phaseCard } >
-              <Bullet>Albuterol continuous neb 20mg x 1hr</Bullet>
-              <Bullet>Ipratropium neb 1.5mg- if not already given</Bullet>
-              <Bullet>Magnesium Sulfate IV 50mg/kg x1 (2g max) for age > 2yo- if not already given</Bullet>
-              <Bullet>Place bed request</Bullet>
-              <Bullet>Rescore after 60 minutes</Bullet>
-            </Card>
-            <View style={{ alignItems: 'stretch', marginTop: 10 }}>
-              <Button title="Start 60 Minute Timer" />
-            </View>
-          </Card>
-
-          <Card title="AFTER 4 HOURS" titleStyle={ styles.phaseHeader }>
-            <Card containerStyle={ [styles.phaseCard, {marginTop: 0}] }>
-              <View>
-                <View style={ styles.labelContainer }>
-                  <Text>Respiratory Score After 4 Hours: { this.state.RS4Hour.score }</Text>
-                </View>
-                <View style={ styles.controlContainer }>
-                  <Text>0</Text>
-                  <View style={ styles.sliderContainer }>
-                    <Slider
-                      minimumValue={0} maximumValue={12} step={1}
-                      thumbTintColor={ theme.button }
-                      value={ this.state.RS4Hour.score }
-                      onValueChange={ v => this.setState({ RS4Hour: {score: v} }) }/>
-                  </View>
-                  <Text>12</Text>
-                </View>
-              </View>
-              <RSCalcButton />
-            </Card>
-            <Card title="RS 9-12" containerStyle={ styles.phaseCard } >
-              <Bullet>Albuterol continuous neb 20mg x 1hr</Bullet>
-              <Bullet>Ipratropium neb 1.5mg- if not already given</Bullet>
-              <Bullet>Magnesium Sulfate IV 50mg/kg x1 (2g max) for age > 2yo- if not already given</Bullet>
-              <Bullet>Place bed request</Bullet>
-              <Bullet>Rescore after 60 minutes</Bullet>
-            </Card>
-            <View style={{ alignItems: 'stretch', marginTop: 10 }}>
-              <Button title="Start 60 Minute Timer" />
-            </View>
-          </Card>
+          {[
+            this.renderPhase0(),
+            this.renderPhase1(),
+            this.renderPhase2(),
+            this.renderPhase3(),
+            this.renderPhase4(),
+          ]}
         </ScrollView>
       </View>
     );
