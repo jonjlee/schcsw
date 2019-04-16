@@ -86,6 +86,7 @@ export const theme = {
   errTextColored: palette.err5,
   greyText: palette.grey5,
   button: palette.primary5,
+  buttonBorder: palette.primary2,
   secondaryButton: palette.secondary5,
   text: palette.grey1,
   phaseHeader: palette.secondary5,

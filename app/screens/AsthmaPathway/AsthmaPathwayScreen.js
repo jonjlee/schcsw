@@ -12,20 +12,43 @@ class AsthmaPathwayScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      RS0Hour: 0,
-      RS1Hour: 0,
-      RS2Hour: 0,
-      RS3Hour: 0,
-      RS4Hour: 0,
+      RS0Hour: {score: 0},
+      RS1Hour: {score: 0},
+      RS2Hour: {score: 0},
+      RS3Hour: {score: 0},
+      RS4Hour: {score: 0},
       timer0State: 0,
+      activePhase: 0,
     }
     
+    // Use debounce to prevent slow slider response caused by repeated setState().
     this.setRS = debounce(this.setState, 20);
   }
-
+  
   render() {
     const headerColor0Hour = this.state.timer0State == 2 ? theme.greyText : theme.phaseHeader;
     const color0Hour = this.state.timer0State == 2 ? theme.greyText : theme.text;
+
+    // The "RS Calculator" button
+    const RSCalcButton = (props) =>
+      <View style={ styles.RSCalcButtonContainer }>
+        <Button
+          title="Respiratory Score Calculator"
+          buttonStyle={ styles.RSCalcButton }
+          titleStyle={ styles.RSCalcButtonTitle }
+          onPress={ ()=>this.props.navigation.navigate(
+            'RSCalcScreen',
+            {
+              // Initialize calculator with current data from our state
+              data: this.state[props.stateVar],
+              onAccept: (data) => {
+                // Save data from calculator to our state variable (e.g. setState({'RS0Hour': data}) )
+                this.setState({[props.stateVar]: data})
+              }
+            })
+          }
+        />
+      </View>
     
     return (
       <View style={ styles.container }>
@@ -43,7 +66,7 @@ class AsthmaPathwayScreen extends Component {
             <Card containerStyle={ [styles.phaseCard, {marginTop: 0}] }>
               <View>
                 <View style={ styles.labelContainer }>
-                  <Text>Respiratory Score on Arrival: { this.state.RS0Hour }</Text>
+                  <Text>Respiratory Score on Arrival: { this.state.RS0Hour.score }</Text>
                 </View>
                 <View style={ styles.controlContainer }>
                   <Text>0</Text>
@@ -51,14 +74,13 @@ class AsthmaPathwayScreen extends Component {
                     <Slider
                       minimumValue={0} maximumValue={12} step={1}
                       thumbTintColor={ theme.button }
-                      onValueChange={ v => this.setRS({ RS0Hour: v }) }/>
+                      value={ this.state.RS0Hour.score }
+                      onValueChange={ v => this.setRS({ RS0Hour: {score: v} }) }/>
                   </View>
                   <Text>12</Text>
                 </View>
               </View>
-              <View style={{ marginTop: 5, alignItems: 'center' }}>
-                <Button buttonStyle={ styles.RSCalcButton } titleStyle={ styles.RSCalcButtonTitle } title="RS Calculator" />
-              </View>
+              <RSCalcButton stateVar="RS0Hour" />
             </Card>
             <Card containerStyle={ styles.phaseCard } >
               <Bullet>Albuterol continuous neb 20mg x 1hr</Bullet>
@@ -82,7 +104,7 @@ class AsthmaPathwayScreen extends Component {
             <Card containerStyle={ [styles.phaseCard, {marginTop: 0}] }>
               <View>
                 <View style={ styles.labelContainer }>
-                  <Text>Respiratory Score After 1 Hour: { this.state.RS1Hour }</Text>
+                  <Text>Respiratory Score After 1 Hour: { this.state.RS1Hour.score }</Text>
                 </View>
                 <View style={ styles.controlContainer }>
                   <Text>0</Text>
@@ -90,14 +112,13 @@ class AsthmaPathwayScreen extends Component {
                     <Slider
                       minimumValue={0} maximumValue={12} step={1}
                       thumbTintColor={ theme.button }
-                      onValueChange={ v => this.setState({ RS1Hour: v }) }/>
+                      value={ this.state.RS1Hour.score }
+                      onValueChange={ v => this.setState({ RS1Hour: {score: v} }) }/>
                   </View>
                   <Text>12</Text>
                 </View>
               </View>
-              <View style={{ marginTop: 5, alignItems: 'center' }}>
-                <Button buttonStyle={ styles.RSCalcButton } titleStyle={ styles.RSCalcButtonTitle } title="RS Calculator" />
-              </View>
+              <RSCalcButton />
             </Card>
             <Card title="RS 9-12" containerStyle={ styles.phaseCard } >
               <Bullet>Albuterol continuous neb 20mg x 1hr</Bullet>
@@ -115,7 +136,7 @@ class AsthmaPathwayScreen extends Component {
             <Card containerStyle={ [styles.phaseCard, {marginTop: 0}] }>
               <View>
                 <View style={ styles.labelContainer }>
-                  <Text>Respiratory Score After 2 Hours: { this.state.RS2Hour }</Text>
+                  <Text>Respiratory Score After 2 Hours: { this.state.RS2Hour.Score }</Text>
                 </View>
                 <View style={ styles.controlContainer }>
                   <Text>0</Text>
@@ -123,14 +144,13 @@ class AsthmaPathwayScreen extends Component {
                     <Slider
                       minimumValue={0} maximumValue={12} step={1}
                       thumbTintColor={ theme.button }
-                      onValueChange={ v => this.setState({ RS2Hour: v }) }/>
+                      value={ this.state.RS2Hour.score }
+                      onValueChange={ v => this.setState({ RS2Hour: {score: v} }) }/>
                   </View>
                   <Text>12</Text>
                 </View>
               </View>
-              <View style={{ marginTop: 5, alignItems: 'center' }}>
-                <Button buttonStyle={ styles.RSCalcButton } titleStyle={ styles.RSCalcButtonTitle } title="RS Calculator" />
-              </View>
+              <RSCalcButton />
             </Card>
             <Card title="RS 9-12" containerStyle={ styles.phaseCard } >
               <Bullet>Albuterol continuous neb 20mg x 1hr</Bullet>
@@ -148,7 +168,7 @@ class AsthmaPathwayScreen extends Component {
             <Card containerStyle={ [styles.phaseCard, {marginTop: 0}] }>
               <View>
                 <View style={ styles.labelContainer }>
-                  <Text>Respiratory Score After 3 Hours: { this.state.RS3Hour }</Text>
+                  <Text>Respiratory Score After 3 Hours: { this.state.RS3Hour.score }</Text>
                 </View>
                 <View style={ styles.controlContainer }>
                   <Text>0</Text>
@@ -156,14 +176,13 @@ class AsthmaPathwayScreen extends Component {
                     <Slider
                       minimumValue={0} maximumValue={12} step={1}
                       thumbTintColor={ theme.button }
-                      onValueChange={ v => this.setState({ RS3Hour: v }) }/>
+                      value={ this.state.RS3Hour.score }
+                      onValueChange={ v => this.setState({ RS3Hour: {score: v} }) }/>
                   </View>
                   <Text>12</Text>
                 </View>
               </View>
-              <View style={{ marginTop: 5, alignItems: 'center' }}>
-                <Button buttonStyle={ styles.RSCalcButton } titleStyle={ styles.RSCalcButtonTitle } title="RS Calculator" />
-              </View>
+              <RSCalcButton />
             </Card>
             <Card title="RS 9-12" containerStyle={ styles.phaseCard } >
               <Bullet>Albuterol continuous neb 20mg x 1hr</Bullet>
@@ -181,7 +200,7 @@ class AsthmaPathwayScreen extends Component {
             <Card containerStyle={ [styles.phaseCard, {marginTop: 0}] }>
               <View>
                 <View style={ styles.labelContainer }>
-                  <Text>Respiratory Score After 4 Hours: { this.state.RS4Hour }</Text>
+                  <Text>Respiratory Score After 4 Hours: { this.state.RS4Hour.score }</Text>
                 </View>
                 <View style={ styles.controlContainer }>
                   <Text>0</Text>
@@ -189,14 +208,13 @@ class AsthmaPathwayScreen extends Component {
                     <Slider
                       minimumValue={0} maximumValue={12} step={1}
                       thumbTintColor={ theme.button }
-                      onValueChange={ v => this.setState({ RS4Hour: v }) }/>
+                      value={ this.state.RS4Hour.score }
+                      onValueChange={ v => this.setState({ RS4Hour: {score: v} }) }/>
                   </View>
                   <Text>12</Text>
                 </View>
               </View>
-              <View style={{ marginTop: 5, alignItems: 'center' }}>
-                <Button buttonStyle={ styles.RSCalcButton } titleStyle={ styles.RSCalcButtonTitle } title="RS Calculator" />
-              </View>
+              <RSCalcButton />
             </Card>
             <Card title="RS 9-12" containerStyle={ styles.phaseCard } >
               <Bullet>Albuterol continuous neb 20mg x 1hr</Bullet>
@@ -243,8 +261,13 @@ const styles = createStyles({
     flex: 1,
     paddingHorizontal: theme.paddingSm,
   },
+  RSCalcButtonContainer: {
+    marginTop: theme.paddingSm,
+    alignItems: 'center'
+  },
   RSCalcButton: {
     paddingVertical: 3,
+    paddingHorizontal: theme.paddingSm,
     backgroundColor: theme.button,
   },
   RSCalcButtonTitle: {

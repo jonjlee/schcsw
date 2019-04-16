@@ -100,7 +100,7 @@ class TimerBar extends Component {
   
   onExpire = () => {
     // let parent know timer finished
-    this.state.expired = true;
+    this.setState({expired: true});
     if (this.props.onDone) {
       this.props.onDone();
     }
@@ -143,7 +143,7 @@ class TimerBar extends Component {
       color = colors.paused;
     }
     
-    // Row with buttons on the left, time in the middle, and info fields on the right
+    // Row with text on the left, divider, time centered on the right with buttons below
     return (
       <View style={ [styles.container, { borderColor: color.border, backgroundColor: color.background }] }>
         <View style={ styles.iconContainer }>
@@ -196,10 +196,6 @@ const styles = StyleSheet.create({
   infoText: {
     color: 'white',
     fontSize: theme.fontSizeSm,
-  },
-  durationText: {
-    color: 'white',
-    fontSize: theme.fontSizeMd,
   },
 
   // Vertical divider in middle
