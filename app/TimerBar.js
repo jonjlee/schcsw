@@ -44,8 +44,8 @@ class TimerBar extends Component {
     AppState.removeEventListener('change', this.onAppStateChange);
   }
   
-  scheduleNotification = (tm, title, body) => {
-    this.notificationId = Notifications.scheduleLocalNotificationAsync(
+  scheduleNotification = async (tm, title, body) => {
+    this.notificationId = await Notifications.scheduleLocalNotificationAsync(
       {
         title: title,
         body: body,
