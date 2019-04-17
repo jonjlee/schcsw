@@ -10,7 +10,7 @@ class FollowupResusScreen extends Component {
   render() {
     return (
       <View style={ styles.container }>
-        <TimerBar duration={ 60 * 60 } />
+        <TimerBar duration={ 60 * 60 } notifyTitle="Sepsis Pathway" notifyBody="60 minutes for step 3 complete" />
         <ScrollView>
           <HTML onLinkPress={ () => this.props.navigation.navigate('MAPGoalsScreen') }>
             {`

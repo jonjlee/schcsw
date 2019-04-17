@@ -1,21 +1,26 @@
 // Row element with an icon and an active timer
 //
 import React, { Component } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { AppState, StyleSheet, Text, View } from 'react-native';
 import { Icon } from 'react-native-elements';
+import { Notifications } from 'expo';
 import { Button } from './common-components';
-import { format, addSeconds } from 'date-fns';
+import { format, addSeconds, differenceInSeconds } from 'date-fns';
 import { theme } from './theme'
 
 class TimerBar extends Component {
   constructor(props) {
     super(props);
     
-    //
+    // appState: used to track when app goes to background
+    // paused: is timer running or paused
     // lapsed: number of seconds since timer started
     // duration: number of seconds to set timer for
-    // start: time in ms timer was started
+    // expired: has timer run for duration number of seconds
+    // start: Date() of when timer was started
+    // end: calculated Date() of when timer should be done
     this.state = {
+      appState: {state: AppState.currentState, time: new Date()},
       paused: true,
       lapsed: 0,
       duration: this.props.duration || 0,
@@ -29,18 +34,33 @@ class TimerBar extends Component {
     // start timer automatically
     this.onReset();
     this.onStart();
+    AppState.addEventListener('change', this.onAppStateChange);
   }
   
   componentWillUnmount() {
-    // Cancel underlying timer when component destroyed
+    // Cancel underlying timer and notification when component destroyed
     clearInterval(this.timerId);
+    Notifications.cancelScheduledNotificationAsync(this.notificationId);
+    AppState.removeEventListener('change', this.onAppStateChange);
   }
   
+  scheduleNotification = (tm, title, body) => {
+    this.notificationId = Notifications.scheduleLocalNotificationAsync(
+      {
+        title: title,
+        body: body,
+        android: { sound: true },
+        ios: { sound: true },
+      },
+      { time: tm },
+    );
+  }
+
   tick = () => {
     this.setState({ lapsed: this.state.lapsed + 1 });
     
     // Trigger expire event if seconds lapsed equals set timer duration, and not already expired
-    if (this.state.duration > 0 && (this.state.lapsed === this.state.duration) && !this.state.expired) {
+    if (this.state.duration > 0 && (this.state.lapsed >= this.state.duration) && !this.state.expired) {
       this.onExpire();
     }
   }
@@ -62,10 +82,28 @@ class TimerBar extends Component {
     return hrStr + minStr + secStr;
   }
   
+  onAppStateChange = (nextAppState) => {
+    // detect when app is brought back to foreground
+    if (
+      this.state.appState.state.match(/inactive|background/) &&
+      nextAppState === 'active' &&
+      !this.state.paused
+    ) {
+      // update our lapsed counter if timer is active
+      this.setState({ lapsed: this.state.lapsed + differenceInSeconds(new Date(), this.state.appState.time) });
+    }
+    this.setState({ appState: {state: nextAppState, time: new Date()} });
+  };
+  
   onPause = () => {
     // stop timer
     this.timerId = clearInterval(this.timerId);
     this.setState({ paused: true });
+
+    // cancel notification
+    if (this.notificationId) {
+      Notifications.cancelScheduledNotificationAsync(this.notificationId);
+    }
   }
   
   onStart = () => {
@@ -83,6 +121,11 @@ class TimerBar extends Component {
       start: start,
       end: end,
     });
+
+    // Schedule notification to occur if requested
+    if (this.props.notifyTitle || this.props.notifyBody) {
+      this.scheduleNotification(end, this.props.notifyTitle, this.props.notifyBody);
+    }
 
     // Call tick() every second
     this.timerId = setInterval(this.tick.bind(this), 1000);

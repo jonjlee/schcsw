@@ -9,10 +9,13 @@ const styles = createStyles();
 
 // A button styled with our theme colors
 export const Button = (props) => {
+  const { type, buttonStyle, ...rest } = props;
+  const backgroundColor = (type === 'outline') ? { backgroundColor: 'transparent' } : null;
   return (
     <RNEButton
-      buttonStyle={ styles.button }
-      {...props} />
+      buttonStyle={ StyleSheet.flatten([ styles.button, backgroundColor, buttonStyle ]) }
+      type={ type }
+      {...rest} />
   );
 };
 
@@ -38,7 +41,7 @@ class LinkButtonComponent extends Component {
         {...rest} />
     );
   }
-};
+}
 export const LinkButton = withNavigation(LinkButtonComponent);
 
 // A centered bolded Text element

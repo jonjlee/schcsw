@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, ScrollView } from 'react-native';
 import { withNavigation } from 'react-navigation';
-import { Card, Slider, Icon } from 'react-native-elements';
+import { Button as RNEButton, Card, Slider, Icon } from 'react-native-elements';
 import { PathwayHeader, SectionHead, Bullet, Button, Text, WarnText } from '../../common-components.js';
 import TimerBar from '../../TimerBar';
 import createStyles, { theme } from '../../theme';
@@ -18,38 +18,64 @@ class AsthmaPathwayScreen extends Component {
       RS2Hour: {score: 1},
       RS3Hour: {score: 1},
       RS4Hour: {score: 1},
-      activePhase: 0,
+      activePhase: 1,
+      phaseTimerStarted: false,
     }
-    
-    // Use debounce to prevent slow slider response caused by repeated setState().
-    this.setRS = debounce(this.setState, 20);
   }
   
+  onStartTimerPress = (phase) => {
+    // Show timer and scroll to bottom of page
+    this.setState({ phaseTimerStarted: true });
+    setTimeout(this.scrollView.scrollToEnd, 0);
+  }
+
+  onResetPress = () => {
+    this.setState({ phaseTimerStarted: false });
+  }
+
+  nextPhase = () => {
+    this.setState({
+      activePhase: this.state.activePhase+1,
+      phaseTimerStarted: false,
+    }, () => {
+      // after render completed, scroll to bottom to reveal new phase
+      setTimeout(this.scrollView.scrollToEnd, 0);
+    })
+  }
+
   renderPhase0 = () => {
-    const greyIfCompleted = this.state.activePhase > 0 ? { color: theme.greyText } : null;
+    const conditionalGreyText = this.state.activePhase > 1 ? { color: theme.greyText } : null;
 
     // Phase 0: give O2 and exclusion criteria
     return (
-      <Card key={0} title="TRIAGE" titleStyle={ [styles.phaseHeader, greyIfCompleted] }>
-        <Bullet style={ greyIfCompleted }>Administer supplemental 02 to keep saturation > 90%</Bullet>
-        <Bullet style={ greyIfCompleted }>
-          <Text style={ [{ fontWeight: 'bold', color: theme.warnTextColored }, greyIfCompleted] }>Exclude</Text><Text style={ greyIfCompleted }>: other primary diagnoses, e.g. PNA, bronchiolitis, croup</Text>
+      <Card key={0} title="TRIAGE" titleStyle={ [styles.phaseHeader, conditionalGreyText] }>
+        <Bullet style={ conditionalGreyText }>Administer supplemental 02 to keep saturation > 90%</Bullet>
+        <Bullet style={ conditionalGreyText }>
+          <Text style={ [{ fontWeight: 'bold', color: theme.warnTextColored }, conditionalGreyText] }>Exclude</Text><Text style={ conditionalGreyText }>: other primary diagnoses, e.g. PNA, bronchiolitis, croup</Text>
         </Bullet>
-        <Bullet style={ greyIfCompleted }>
-          <Text style={ [{ fontWeight: 'bold', color: theme.warnTextColored }, greyIfCompleted] }>Exclude</Text><Text style={ greyIfCompleted }>: chronic conditions, e.g. cystic fibrosis, restrictive lung disease, BPD, cardiac diseases, airway issues (vocal cord paralysis, tracheomalacia, trach dependent), medically complex children, immune disorders, sickle cell</Text>
+        <Bullet style={ conditionalGreyText }>
+          <Text style={ [{ fontWeight: 'bold', color: theme.warnTextColored }, conditionalGreyText] }>Exclude</Text><Text style={ conditionalGreyText }>: chronic conditions, e.g. cystic fibrosis, restrictive lung disease, BPD, cardiac diseases, airway issues (vocal cord paralysis, tracheomalacia, trach dependent), medically complex children, immune disorders, sickle cell</Text>
         </Bullet>
       </Card>
     );
   }
   
-  renderGenericPhase = ({ phase, title, rsLabel, score, rsStateVar, bulletsTitle, bullets, active, completed }) => {
+  renderGenericPhase = ({ phase, title, rsLabel, score, rsStateVar, bulletsTitle, bullets }) => {
+    const visible = (this.state.activePhase >= phase);
+    const timerActive = (this.state.activePhase === phase) && this.state.phaseTimerStarted;
+    const greyedOut = (this.state.activePhase > phase);
+    const conditionalGreyText = greyedOut ? { color: theme.greyText } : null;
+    const conditionalGreyBkg = greyedOut ? { backgroundColor: theme.greyText } : null;
+    const conditionalGreyBorder = greyedOut ? { borderColor: theme.greyText } : {};
+
     // The "RS Calculator" button
     const RSCalcButton = (props) =>
       <View style={ styles.RSCalcButtonContainer }>
         <Button
-          title="Respiratory Score Calculator"
-          buttonStyle={ [styles.RSCalcButton, props.style] }
-          titleStyle={ styles.RSCalcButtonTitle }
+          title="Score Calculator"
+          type="outline"
+          buttonStyle={ conditionalGreyBorder }
+          titleStyle={ conditionalGreyText }
           onPress={ () => this.props.navigation.navigate(
             'RSCalcScreen',
             {
@@ -64,52 +90,61 @@ class AsthmaPathwayScreen extends Component {
         />
       </View>
 
-    const greyIfCompleted = completed ? { color: theme.greyText } : null;
-    const backgroundGreyIfCompleted = completed ? { backgroundColor: theme.greyText } : null;
-    
+    if (!visible) {
+      return null;
+    }
+
     return (
-      <Card key={phase} title={ title } titleStyle={ [styles.phaseHeader, greyIfCompleted] }>
+      <Card key={phase} title={ title } titleStyle={ [styles.phaseHeader, conditionalGreyText] }>
         <Card containerStyle={ styles.phaseCard }>
 
           { /* Respiratory score label and slider */ }
           <View>
             <View style={ styles.labelContainer }>
-              <Text style={ greyIfCompleted }>{ rsLabel + ': ' + score }</Text>
+              <Text style={ conditionalGreyText }>{ rsLabel + ': ' + score }</Text>
             </View>
             <View style={ styles.controlContainer }>
               { /* Minimum value label */ }
-              <Text style={ greyIfCompleted }>1</Text>
+              <Text style={ conditionalGreyText }>1</Text>
               { /* Slider control */ }
               <View style={ styles.sliderContainer }>
                 <Slider
                   minimumValue={1} maximumValue={12} step={1}
-                  thumbTintColor={ completed ? theme.greyText : theme.button }
+                  thumbTintColor={ greyedOut ? theme.greyText : theme.button }
                   value={ score }
                   onValueChange={ v => this.setState({ [rsStateVar]: {score: v} }) }/>
               </View>
               { /* Max value label */ }
-              <Text style={ greyIfCompleted }>12</Text>
+              <Text style={ conditionalGreyText }>12</Text>
             </View>
           </View>
 
           { /* RS Calculator button */ }
-          <RSCalcButton style={ backgroundGreyIfCompleted } stateVar={ rsStateVar } />
+          <RSCalcButton style={ conditionalGreyBkg } stateVar={ rsStateVar } />
         </Card>
         
         { /* Actions to perform given RS */ }
-        <Card title={ bulletsTitle } containerStyle={ styles.phaseCard } >
+        <Card title={ bulletsTitle } containerStyle={ styles.phaseCard } titleStyle={ conditionalGreyText }>
           {
-            bullets.map((text, i) => <Bullet key={i} style={ greyIfCompleted }>{ text }</Bullet>)
+            bullets.map((text, i) => <Bullet key={i} style={ conditionalGreyText }>{ text }</Bullet>)
           }
         </Card>
 
         { /* Start Timer button or timer bar */ }
         <View style={{ alignItems: 'stretch', marginTop: 10 }}>
           {
-            active ?
-              <TimerBar duration={ 20 } /> :
-            !completed ?
-              <Button title="Start 60 Minute Timer" onPress={ () => this.setState({ activePhase: phase }) } /> :
+            timerActive ?
+              <View>
+                <TimerBar duration={ 20 } onDone={ this.nextPhase } notifyTitle="Asthma Pathway" notifyBody={ 'Hour ' + phase + ' complete. Rescore patient.' } />
+                {(phase < 4 ?
+                  <View style={ styles.timerToolbar }>
+                    <Button title="Reset" type="outline" containerStyle={{ flex: 1 }} buttonStyle={ styles.timerToolbarButton } onPress={ this.onResetPress } />
+                    <Button title="Skip" type="outline" containerStyle={{ flex: 1 }} buttonStyle={ styles.timerToolbarButton } onPress={ this.nextPhase } />
+                  </View> :
+                  null)}
+              </View> :
+            !greyedOut ?
+              <Button title="Start Timer" onPress={ () => this.onStartTimerPress(phase) } /> :
               null
           }
         </View>
@@ -119,11 +154,6 @@ class AsthmaPathwayScreen extends Component {
   
   renderPhase1 = () => {
     const phase = 1;
-    const phaseVisible = (this.state.activePhase >= (phase-1));
-    if (!phaseVisible) {
-      return null;
-    }
-    
     let bulletsTitle = null;
     let bullets = null;
     if (this.state.RS0Hour.score <= 5) {
@@ -153,19 +183,12 @@ class AsthmaPathwayScreen extends Component {
       score: this.state['RS0Hour'].score,
       rsStateVar: 'RS0Hour',
       bulletsTitle: bulletsTitle,
-      bullets: bullets,
-      active: (this.state.activePhase === phase),
-      completed: (this.state.activePhase > phase)
+      bullets: bullets
     });
   }
   
   renderPhase2 = () => {
     const phase = 2;
-    const phaseVisible = (this.state.activePhase >= (phase-1));
-    if (!phaseVisible) {
-      return null;
-    }
-
     let bulletsTitle = null;
     let bullets = null;
     if (this.state.RS1Hour.score <= 4) {
@@ -187,8 +210,6 @@ class AsthmaPathwayScreen extends Component {
       rsStateVar: 'RS1Hour',
       bulletsTitle: bulletsTitle,
       bullets: bullets,
-      active: (this.state.activePhase === phase),
-      completed: (this.state.activePhase > phase)
     });
   }
   
@@ -223,8 +244,6 @@ class AsthmaPathwayScreen extends Component {
       rsStateVar: 'RS2Hour',
       bulletsTitle: bulletsTitle,
       bullets: bullets,
-      active: (this.state.activePhase === phase),
-      completed: (this.state.activePhase > phase)
     });
   }
   
@@ -259,15 +278,13 @@ class AsthmaPathwayScreen extends Component {
       rsStateVar: 'RS3Hour',
       bulletsTitle: bulletsTitle,
       bullets: bullets,
-      active: (this.state.activePhase === phase),
-      completed: (this.state.activePhase > phase)
     });
   }
   
   render() {
     return (
       <View style={ styles.container }>
-        <ScrollView>
+        <ScrollView ref={ref => this.scrollView = ref}>
           {[
             this.renderPhase0(),
             this.renderPhase1(),
@@ -320,6 +337,14 @@ const styles = createStyles({
   },
   RSCalcButtonTitle: {
     fontSize: theme.fontSizeMd,
+  },
+  timerToolbar: {
+    flexDirection: 'row',
+    marginTop: theme.paddingXs,
+  },
+  timerToolbarButton: {
+    marginHorizontal: theme.paddingSm,
+    paddingVertical: 3,
   },
 });
 
