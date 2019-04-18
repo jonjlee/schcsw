@@ -18,9 +18,6 @@ class SepsisPathwayScreen extends Component {
     return (
       <View style={ styles.container }>
         <ScrollView>
-          <WarnText>
-            Use the ED Suspected Septic Shock pathway for ill appearing patients including HemOnc/BMT, Central Line Infection and Neonates.
-          </WarnText>
           <HTML onLinkPress={ this.onLinkPress }>
             {`
               <h4>Inclusion criteria</h4>
