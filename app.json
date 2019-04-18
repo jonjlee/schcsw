@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "SCH Pathways",
+    "name": "Pathways",
     "slug": "schcsw",
     "privacy": "public",
     "sdkVersion": "32.0.0",
@@ -8,7 +8,7 @@
       "ios",
       "android"
     ],
-    "version": "1.0.0",
+    "version": "0.9.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -24,8 +24,11 @@
     ],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "io.github.jonjlee"
+      "bundleIdentifier": "io.github.jonjlee.schcsw"
     },
-    "description": ""
+    "android": {
+      "package": "io.github.jonjlee.schcsw"
+    },
+    "description": "Clinical standard work pathways created by Seattle Children's Hospital."
   }
 }
