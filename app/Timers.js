@@ -196,11 +196,11 @@ class Timers {
     // detect when app is brought back to foreground (setInterval() doesn't run in background)
   _onAppStateChange = (nextAppState) => {
     const now = new Date();
-
     if (this.appState && this.appState.state && this.appState.state.match(/inactive|background/) && nextAppState === 'active') {
       // update all active (non-paused) timers' lapsed counters
       const lapsed = differenceInSeconds(now, this.appState.time);
-      for (let timer in this.timers) {
+      for (let id in this.timers) {
+        const timer = this.timers[id];
         if (!timer.paused) {
           // subtract 1 second and call _tick to add last second so user callbacks executed correctly
           timer.lapsed = timer.lapsed + lapsed - 1;
