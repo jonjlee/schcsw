@@ -106,6 +106,7 @@ class OngoingResusScreen extends Component {
       <View>
         <View style={ styles.abxButtonGroupContainer }>
           <ButtonGroup
+            containerStyle={{minHeight:47, marginBottom: 12}}
             textStyle={{textAlign: 'center'}}
             buttons={buttons}
             selectedIndex={selectedPopulationIdx}
