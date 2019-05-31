@@ -3,6 +3,7 @@ import { View, ScrollView } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import { Button as RNEButton, Card, Slider, Icon } from 'react-native-elements';
 import { PathwayHeader, SectionHead, Bullet, Button, Text, WarnText } from '../../common-components.js';
+import Timers from '../../Timers';
 import TimerBar from '../../TimerBar';
 import createStyles, { theme } from '../../theme';
 import { debounce } from 'lodash';
@@ -24,16 +25,27 @@ class AsthmaPathwayScreen extends Component {
   }
   
   onStartTimerPress = (phase) => {
+    // Initialize and start new timer
+    this.timer = Timers.replace('asthma', {
+      duration: 5,
+      onDone: this.nextPhase,
+      notifyTitle: 'Asthma Pathway',
+      notifyBody: 'Hour ' + phase + ' complete. Rescore patient.',
+    })
+    this.timer.start();
+    
     // Show timer and scroll to bottom of page
     this.setState({ phaseTimerStarted: true });
     setTimeout(this.scrollView.scrollToEnd, 0);
   }
 
   onResetPress = () => {
+    this.timer.destroy();
     this.setState({ phaseTimerStarted: false });
   }
 
   nextPhase = () => {
+    this.timer.destroy();
     this.setState({
       activePhase: this.state.activePhase+1,
       phaseTimerStarted: false,
@@ -135,7 +147,7 @@ class AsthmaPathwayScreen extends Component {
           {
             timerActive ?
               <View>
-                <TimerBar duration={ 20 } onDone={ this.nextPhase } notifyTitle="Asthma Pathway" notifyBody={ 'Hour ' + phase + ' complete. Rescore patient.' } />
+                <TimerBar timer={ this.timer } />
                 {(phase < 4 ?
                   <View style={ styles.timerToolbar }>
                     <Button title="Reset" type="outline" containerStyle={{ flex: 1 }} buttonStyle={ styles.timerToolbarButton } onPress={ this.onResetPress } />

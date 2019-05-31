@@ -1,11 +1,10 @@
 // React Navigation
-import { Platform } from 'react-native';
 import { createStackNavigator, createSwitchNavigator } from 'react-navigation';
 
 // Screens
 import SettingsScreen from './screens/Settings';
 import PathwaysScreen from './screens/Pathways';
-import { ActivateSepsisPathwayScreen, FollowupResusScreen, InitialResusScreen, OngoingResusScreen, SepsisAdmitScreen, SepsisPathwayScreen } from './screens/SepsisPathway';
+import { SepsisPathwayScreen, ActivateSepsisPathwayScreen, Sepsis1Screen, Sepsis2Screen, Sepsis3Screen, Sepsis4Screen } from './screens/SepsisPathway';
 import SepsisCalcScreen from './screens/SepsisCalc';
 import MAPGoalsScreen from './screens/MAPGoals';
 import { AsthmaPathwayScreen } from './screens/AsthmaPathway';
@@ -27,7 +26,7 @@ const PathwaysStack = createStackNavigator(
   
 // Stack for specific pathway
 const SepsisPathwayStack = createStackNavigator(
-  { SepsisPathwayScreen, SepsisCalcScreen, MAPGoalsScreen, ActivateSepsisPathwayScreen, InitialResusScreen, OngoingResusScreen, FollowupResusScreen, SepsisAdmitScreen },
+  { SepsisPathwayScreen, SepsisCalcScreen, MAPGoalsScreen, ActivateSepsisPathwayScreen, Sepsis1Screen, Sepsis2Screen, Sepsis3Screen, Sepsis4Screen },
   { defaultNavigationOptions });
 const AsthmaPathwayStack = createStackNavigator(
   { AsthmaPathwayScreen, RSCalcScreen },

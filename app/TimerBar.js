@@ -1,162 +1,54 @@
-// Row element with an icon and an active timer
+// Row element with an icon that displays information for a timer from Timers.js
 //
 import React, { Component } from 'react';
-import { AppState, StyleSheet, Text, View } from 'react-native';
-import { Icon } from 'react-native-elements';
-import { Notifications } from 'expo';
-import { Button } from './common-components';
-import { format, addSeconds, differenceInSeconds } from 'date-fns';
+import PropTypes from 'prop-types';
+import { StyleSheet, Text, View } from 'react-native';
+import { Card, Icon } from 'react-native-elements';
+import { SectionHead, Button } from './common-components';
+import Timers from './Timers';
 import { theme } from './theme'
 
 class TimerBar extends Component {
   constructor(props) {
     super(props);
     
-    // appState: used to track when app goes to background
-    // paused: is timer running or paused
-    // lapsed: number of seconds since timer started
-    // duration: number of seconds to set timer for
-    // expired: has timer run for duration number of seconds
-    // start: Date() of when timer was started
-    // end: calculated Date() of when timer should be done
+    const id = (Math.floor(Math.random() * 90000) + 10000);
     this.state = {
-      appState: {state: AppState.currentState, time: new Date()},
-      paused: true,
+      paused: this.props.timer && this.props.timer.paused,
       lapsed: 0,
-      duration: this.props.duration || 0,
-      expired: false,
-      start: null,
-      end: null,
     };
   }
-
+  
   componentWillMount() {
-    // start timer automatically
-    this.onReset();
-    this.onStart();
-    AppState.addEventListener('change', this.onAppStateChange);
-  }
-  
-  componentWillUnmount() {
-    // Cancel underlying timer and notification when component destroyed
-    clearInterval(this.timerId);
-    Notifications.cancelScheduledNotificationAsync(this.notificationId);
-    AppState.removeEventListener('change', this.onAppStateChange);
-  }
-  
-  scheduleNotification = async (tm, title, body) => {
-    this.notificationId = await Notifications.scheduleLocalNotificationAsync(
-      {
-        title: title,
-        body: body,
-        android: { sound: true },
-        ios: { sound: true },
-      },
-      { time: tm },
-    );
+    // take over handling the tick event for the underlying timer
+    this.props.timer.onTick = this.onTick;
   }
 
-  tick = () => {
-    this.setState({ lapsed: this.state.lapsed + 1 });
-    
-    // Trigger expire event if seconds lapsed equals set timer duration, and not already expired
-    if (this.state.duration > 0 && (this.state.lapsed >= this.state.duration) && !this.state.expired) {
-      this.onExpire();
-    }
+  componentWillUnmount() {
+    this.props.timer.onTick = null;
   }
-  
-  formatLapsed = (numSecs) => {
-    if (numSecs < 0) {
-      return '--'
-    }
-    
-    const hr = Math.floor(numSecs/60/60);
-    const min = Math.floor((numSecs % 3600) /60);
-    const sec = numSecs % 60;
-    
-    // if >= 1 hour, format H:MM:SS, otherwise M:SS
-    const pad = (n) => (n < 10 ? '0' : '') + n;
-    const hrStr = (hr > 0 ? (hr + ':') : '');
-    const minStr =(hr > 0 ? pad(min) : min) + ':';
-    const secStr = pad(sec)
-    return hrStr + minStr + secStr;
+
+  onTick = () => {
+    this.setState({ lapsed: this.props.timer.lapsed });
   }
-  
-  onAppStateChange = (nextAppState) => {
-    // detect when app is brought back to foreground
-    if (
-      this.state.appState.state.match(/inactive|background/) &&
-      nextAppState === 'active' &&
-      !this.state.paused
-    ) {
-      // update our lapsed counter if timer is active
-      this.setState({ lapsed: this.state.lapsed + differenceInSeconds(new Date(), this.state.appState.time) });
-    }
-    this.setState({ appState: {state: nextAppState, time: new Date()} });
-  };
   
   onPause = () => {
     // stop timer
-    this.timerId = clearInterval(this.timerId);
+    this.props.timer.pause();
     this.setState({ paused: true });
-
-    // cancel notification
-    if (this.notificationId) {
-      Notifications.cancelScheduledNotificationAsync(this.notificationId);
-    }
   }
   
   onStart = () => {
-    // Calculate end time based on number of seconds remaining
-    const start = this.state.start || new Date();
-    const duration = this.state.duration;
-    const remaining = this.state.duration - this.state.lapsed;
-    const end = (duration > 0 && remaining >= 0) ?
-      addSeconds(new Date(), remaining) :
-      this.state.end;
-
-    // Calculate end time
-    this.setState({
-      paused: false,
-      start: start,
-      end: end,
-    });
-
-    // Schedule notification to occur if requested
-    if (this.props.notifyTitle || this.props.notifyBody) {
-      this.scheduleNotification(end, this.props.notifyTitle, this.props.notifyBody);
-    }
-
-    // Call tick() every second
-    this.timerId = setInterval(this.tick.bind(this), 1000);
+    this.props.timer.start();
+    this.props.timer.onTick = this.onTick;
+    this.setState({ paused: false });
   }
   
-  onReset = () => {
-    // Reset start time and number of seconds lapsed
-    this.setState({
-      lapsed: 0,
-      start: null,
-      end: null,
-      expired: false,
-    });
-  }
-  
-  onExpire = () => {
-    // let parent know timer finished
-    this.setState({expired: true});
-    if (this.props.onDone) {
-      this.props.onDone();
-    }
-  }
-
   render() {
-    // Convert start, end, and timer to readable strings
-    const started = this.state.start !== null;
-    const startStr = this.state.start ? format(this.state.start, 'h:mma') : '--';
-    const endStr = (this.state.end && !this.state.paused) ? format(this.state.end, 'h:mma') : '--';
-    const remainStr = this.state.duration > 0 ? this.formatLapsed(this.state.duration - this.state.lapsed) : '';
-    const timeStr = this.formatLapsed(this.state.lapsed);
-    const durationStr = this.formatLapsed(this.state.duration);
+    // Read timer info
+    const expired = this.props.timer.expired;
+    const paused = this.props.timer.paused;
+    const display = this.props.timer.display();
 
     // Timer turns yellow when paused and red after duration passes
     const colors = {
@@ -180,9 +72,9 @@ class TimerBar extends Component {
       }
     };
     let color = colors.active;
-    if (this.state.expired) {
+    if (expired) {
       color = colors.expired;
-    } else if (this.state.paused) {
+    } else if (paused) {
       color = colors.paused;
     }
     
@@ -193,28 +85,61 @@ class TimerBar extends Component {
           <Icon type='material' name='timer' size={ 36 } color={ color.text } />
         </View>
         <View style={ styles.infoContainer }>
-          <Text style={ [styles.infoText, {color: color.text}] }>Started: { startStr }</Text>
-          <Text style={ [styles.infoText, {color: color.text}] }>Expires: { endStr }</Text>
-          <Text style={ [styles.infoText, {color: color.text}] }>Remaining: { remainStr }</Text>
+          <Text style={ [styles.infoText, {color: color.text}] }>Started: { display.start }</Text>
+          <Text style={ [styles.infoText, {color: color.text}] }>Expires: { display.end }</Text>
+          <Text style={ [styles.infoText, {color: color.text}] }>Remaining: { display.remain }</Text>
         </View>
         <View style={ [styles.divider, { borderColor: color.highlight }] } />
         <View style={ styles.rightContainer}>
           <View style={ styles.timerContainer }>
             <View style={ styles.timerTextContainer }>
-              <Text style={ [styles.timerText, {color: color.text}] }>{ timeStr }</Text>
+              <Text style={ [styles.timerText, {color: color.text}] }>{ display.lapsed }</Text>
             </View>
             <View style={ styles.toolbar }>
               <Button
-                icon={{ name: this.state.paused ? 'play-arrow' : 'stop', color: color.text, size: theme.fontSizeLg }}
+                icon={{ name: paused ? 'play-arrow' : 'stop', color: color.text, size: theme.fontSizeLg }}
                 buttonStyle={ [styles.button, { backgroundColor: color.background, borderColor: color.text }] }
                 titleStyle={{ fontSize: theme.fontSizeSm }}
-                onPress={ this.state.paused ? this.onStart : this.onPause } />
+                onPress={ paused ? this.onStart : this.onPause } />
             </View>
           </View>
         </View>
       </View>
     );
   }
+}
+
+// Property types for <TimerBar>
+TimerBar.propTypes = {
+  timer: PropTypes.object.isRequired,
+  onTick: PropTypes.func,
+  onDone: PropTypes.func,
+}
+
+// A card that either displays a timer if props.active or text with a start button
+export const ConditionalTimerBar = (props) => {
+  if (props.active) {
+    return (<TimerBar timer={ props.timer } />);
+  } else if (props.pending) {
+    return (
+      <Card containerStyle={ styles.banner }>
+        <View style={{flexDirection: 'row'}}>
+          <SectionHead>Step Not Active</SectionHead>
+          <Button title="Start Now" type="outline" onPress={ props.onActivate } />
+        </View>
+      </Card>
+    );
+  } else if (props.done) {
+    return (
+      <Card containerStyle={ styles.banner }>
+        <View style={{flexDirection: 'row'}}>
+          <SectionHead>Step Completed</SectionHead>
+          <Button title="Restart" type="outline" onPress={ props.onActivate } />
+        </View>
+      </Card>
+    );
+  }
+  return null;
 }
 
 const styles = StyleSheet.create({
@@ -226,6 +151,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 2,
     borderColor: theme.okBorder,
+  },
+  banner: {
+    marginHorizontal: 5,
   },
   
   // Info panel to left

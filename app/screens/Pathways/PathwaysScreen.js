@@ -29,12 +29,9 @@ class PathwaysScreen extends Component {
           params: {},
         },
         {
-          name: 'Croup',
-        },
-        {
           name: 'Septic Shock',
           screen: 'Sepsis',
-          params: {}
+          params: { activePhase: 0 }
         }
       ]
     };
@@ -45,7 +42,7 @@ class PathwaysScreen extends Component {
       title = { item.name }
       subtitle = { item.subtitle }
       chevron={ !!item.screen }
-      onPress={ () => item.screen && this.props.navigation.navigate(item.screen) }
+      onPress={ () => item.screen && this.props.navigation.navigate(item.screen, item.params) }
     />
   );
 

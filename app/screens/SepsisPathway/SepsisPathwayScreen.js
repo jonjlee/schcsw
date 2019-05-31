@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Text, View, ScrollView } from 'react-native';
-import { PathwayHeader, LinkButton, HTML, WarnText, Footer } from '../../common-components';
+import { PathwayHeader, LinkButton, HTML, WarnText, StandardPathwayFooter } from '../../common-components';
 import createStyles from '../../theme';
 
 class SepsisPathwayScreen extends Component {
@@ -37,9 +37,10 @@ class SepsisPathwayScreen extends Component {
             `}
           </HTML>
         </ScrollView>
-        <Footer>
-          <LinkButton title="Start" target="ActivateSepsisPathwayScreen" />
-        </Footer>
+        <StandardPathwayFooter
+          title="Start"
+          target="ActivateSepsisPathwayScreen"
+          params={{ activePhase: 0 }} />
       </View>
     );
   }
