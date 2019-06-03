@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
 import { Card } from 'react-native-elements';
-import { PathwayHeader, SectionHead, Button, LinkButton, HTML, PatientWeight, StandardPathwayFooter } from '../../common-components';
+import { PathwayHeader, SectionHead, Button, LinkButton, HTML, PatientWeight } from '../../common-components';
+import { Footer } from './SepsisNavigator';
 import Timers from '../../Timers';
-import { ConditionalTimerBar } from '../../TimerBar';
+import TimerBar from '../../TimerBar';
 import Helpers from '../../helpers';
 import createStyles, { theme } from '../../theme';
-
-const PHASE_NUM = 1;
 
 class InitialResusScreen extends Component {
   static navigationOptions = ({ navigation }) => PathwayHeader(navigation, 'Step 1: Initial 15 Minutes');
@@ -17,28 +16,9 @@ class InitialResusScreen extends Component {
 
     const activePhase = this.props.navigation.getParam('activePhase');
     this.state = {
-      pending: activePhase === undefined || activePhase < PHASE_NUM,
-      active: activePhase == PHASE_NUM,
-      done: activePhase > PHASE_NUM,
-
       ptWeight: this.props.navigation.getParam('ptWeight', ''),
     }
     this.timer = Timers.get('sepsis');
-  }
-
-  activate = () => {
-    this.restartTimer();
-    this.props.navigation.setParams({ activePhase: PHASE_NUM, startOnRender: false });
-    this.setState({active: true, pending: false, done: false})
-  }
-
-  restartTimer = () => {
-    this.timer = Timers.replace('sepsis', {
-      duration: 15 * 60,
-      notifyTitle: 'Sepsis Pathway',
-      notifyBody: '15 minutes for step 2 expired. Proceed to next step.'
-    });
-    this.timer.start();
   }
 
   handleWeightInput = (v) => {
@@ -48,18 +28,13 @@ class InitialResusScreen extends Component {
   }
 
   render() {
-    // the startOnRender flag indicates that this phase should
-    // be automatically started when the user switches to it
-    if (this.state.active && this.props.navigation.getParam('startOnRender')) {
-      this.restartTimer();
-      this.props.navigation.state.params.startOnRender = false;
-    }
-
+    const activePhase = this.props.navigation.getParam('activePhase', -1);
+    const pathwayStarted = activePhase >= 2;
     const weight = this.state.ptWeight ? parseFloat(this.state.ptWeight) : 0;
 
     return (
       <View style={ styles.container }>
-        <ConditionalTimerBar timer={ this.timer } onActivate={ this.activate } {...this.state}/>
+        { !pathwayStarted ? null : <TimerBar timer={ this.timer } /> }
         <PatientWeight weight={ this.state.ptWeight } onChange={ this.handleWeightInput } />
         <ScrollView>
           <HTML>
@@ -93,12 +68,7 @@ class InitialResusScreen extends Component {
             `}
           </HTML>
         </ScrollView>
-        <StandardPathwayFooter
-          prev="ActivateSepsisPathwayScreen"
-          title="Activate Step 2 (30 min)"
-          target="Sepsis2Screen"
-          params={{ activePhase: 2, startOnRender: true }}
-        />
+        <Footer phaseIndex={ 2 } />
       </View>
     );
   }

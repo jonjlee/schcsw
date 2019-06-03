@@ -38,26 +38,6 @@ class Timers {
     return timer;
   }
   
-  // create or replace an existing timer
-  replace = (id, options={}) => {
-    this.destroy(id);
-    return this.get(id, options);
-  }
-  
-  // stop and remove a timer
-  destroy = (timerOrId) => {
-    const timer = (typeof timerOrId === 'object') ? timerOrId : this.timers[timerOrId];
-    if (timer) {
-      // stop underlying timer and cancel its notification
-      clearInterval(timer.timerId);
-      if (timer.notificationId) {
-        Notifications.cancelScheduledNotificationAsync(timer.notificationId);
-      }
-  
-      delete this.timers[timer.id];
-    }
-  }
-  
   // start running a given timer
   start = (timer) => {
     // don't do anything if timer doesn't exist or already running (not paused)
@@ -69,17 +49,18 @@ class Timers {
     const startTime = timer.startTime || new Date();
     const duration = timer.duration;
     const remaining = timer.duration - timer.lapsed;
-    const endTime = (duration > 0 && remaining >= 0) ?
+    const hasRemaining = (duration > 0 && remaining >= 0);
+    const endTime = hasRemaining ?
       addSeconds(new Date(), remaining) :
       timer.endTime;
 
     // Store start and end time
     timer.paused = false;
     timer.startTime = startTime;
-    timer.endTime = endTime;
+    timer.endTime = (endTime === null && duration > 0)  ? addSeconds(startTime, duration) : endTime;
 
     // Schedule notification to occur if requested
-    if (timer.notifyTitle || timer.notifyBody) {
+    if (hasRemaining && (timer.notifyTitle || timer.notifyBody)) {
       this._scheduleNotification(timer, endTime, timer.notifyTitle, timer.notifyBody);
     }
 
@@ -101,6 +82,20 @@ class Timers {
     }
   }
   
+  // Dynamically change the duration of the timer. Resets the expired state if duration > lapsed.
+  changeDuration = (timer, duration) => {
+    timer.duration = duration;
+    timer.expired = (timer.lapsed >= timer.duration);
+    timer.endTime = null;
+    this._recalculate(timer);
+  }
+  
+  changeNotification = (timer, title, body) => {
+    timer.notifyTitle = title;
+    timer.notifyBody = body;
+    this._recalculate(timer);
+  }
+  
   // Return human readable strings for start time, end time, remaining, lapsed, and duration
   display = (timer) => {
     return {
@@ -112,12 +107,32 @@ class Timers {
     }
   }
 
+  // create or replace an existing timer
+  replace = (id, options={}) => {
+    this.destroy(id);
+    return this.get(id, options);
+  }
+  
+  // stop and remove a timer
+  destroy = (timerOrId) => {
+    const timer = (typeof timerOrId === 'object') ? timerOrId : this.timers[timerOrId];
+    if (timer) {
+      // stop underlying timer and cancel its notification
+      clearInterval(timer.timerId);
+      if (timer.notificationId) {
+        Notifications.cancelScheduledNotificationAsync(timer.notificationId);
+      }
+  
+      delete this.timers[timer.id];
+    }
+  }
+
   
   // -------------------------------------------
   // Helpers
   // -------------------------------------------
   // Create a new timer and return it in paused state
-  _create = (id, { duration=0, onTick, onDone, notifyTitle, notifyBody }) => {
+  _create = (id, { duration=0, onTick, onDone, notifyTitle, notifyBody, vibrate }) => {
     // sanity check for duration
     duration = (duration && duration > 0) ? duration : 0;
 
@@ -138,6 +153,7 @@ class Timers {
       notificationTime: null,
       notifyTitle: notifyTitle,
       notifyBody: notifyBody,
+      vibrate: true,
 
       // time details; duration and lapsed are in seconds
       duration: duration,
@@ -151,8 +167,10 @@ class Timers {
     // convenience functions, so you can do timer.start() rather than TimersInstance.start(timer)
     timer.start = this.start.bind(this, timer);
     timer.pause = this.pause.bind(this, timer);
-    timer.destroy = this.destroy.bind(this, timer);
+    timer.changeDuration = this.changeDuration.bind(this, timer);
+    timer.changeNotification = this.changeNotification.bind(this.timer);
     timer.display = this.display.bind(this, timer);
+    timer.destroy = this.destroy.bind(this, timer);
 
     // Store and return new timer
     this.timers[id] = timer;
@@ -181,17 +199,26 @@ class Timers {
   
   // Schedule a local device notification
   _scheduleNotification = async (timer, tm, title, body) => {
-    timer.notificationId = await Notifications.scheduleLocalNotificationAsync(
-      {
-        title: title,
-        body: body,
-        android: { sound: true },
-        ios: { sound: true },
-      },
-      { time: tm },
-    );
+    try {
+      timer.notificationId = await Notifications.scheduleLocalNotificationAsync(
+        {
+          title: title,
+          body: body,
+          android: { sound: true },
+          ios: { sound: true },
+        },
+        { time: tm },
+      );
+    } catch (e) {
+      console.log(new Date(), 'Could not schedule timer notification', e);
+    }
   }
 
+  _recalculate = (timer) => {
+    // Pause and restart timer to recalculate endTime and reschedule notification with new text
+    this.pause(timer);
+    this.start(timer);
+  }
   
     // detect when app is brought back to foreground (setInterval() doesn't run in background)
   _onAppStateChange = (nextAppState) => {

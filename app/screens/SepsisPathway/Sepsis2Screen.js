@@ -1,53 +1,21 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
-import { PathwayHeader, SectionHead, Text, Button, Bullet, LinkButton, HTML, PatientWeight, StandardPathwayFooter } from '../../common-components';
+import { PathwayHeader, SectionHead, Text, Button, Bullet, LinkButton, HTML, PatientWeight } from '../../common-components';
+import { Footer } from './SepsisNavigator';
 import { Card, Input, ButtonGroup } from 'react-native-elements';
 import Timers from '../../Timers';
-import { ConditionalTimerBar } from '../../TimerBar';
+import TimerBar from '../../TimerBar';
 import Helpers from '../../helpers';
 import createStyles, { theme } from '../../theme';
 
-const PHASE_NUM = 2;
-
 class OngoingResusScreen extends Component {
-  static navigationOptions = ({ navigation }) => PathwayHeader(navigation, 'Step 2: 30 Minutes', { headerLeft: null });
+  static navigationOptions = ({ navigation }) => PathwayHeader(navigation, 'Step 2: Within 30 Minutes', { headerLeft: null });
 
   constructor(props) {
     super(props);
-
-    const activePhase = this.props.navigation.getParam('activePhase');
-    this.state = {
-      pending: activePhase === undefined || activePhase < PHASE_NUM,
-      active: activePhase == PHASE_NUM,
-      done: activePhase > PHASE_NUM,
-
-      ptWeight: this.props.navigation.getParam('ptWeight', ''),
-      selAbxIdx: 0,
-    }
     this.timer = Timers.get('sepsis');
   }
   
-  activate = () => {
-    this.restartTimer();
-    this.props.navigation.setParams({ activePhase: PHASE_NUM, startOnRender: false });
-    this.setState({active: true, pending: false, done: false})
-  }
-
-  restartTimer = () => {
-    this.timer = Timers.replace('sepsis', {
-      duration: 30 * 60,
-      notifyTitle: 'Sepsis Pathway',
-      notifyBody: '30 minutes for step 2 expired. Proceed to next step.'
-    });
-    this.timer.start();
-  }
-
-  handleWeightInput = (v) => {
-    // update both navigator state and react state
-    this.props.navigation.setParams({ptWeight: v});
-    this.setState({ptWeight: v});
-  }
-
   renderSepsisAbxTable = (selectedPopulationIdx, weight, onPressButton) => {
     const doseCTX = Helpers.getDose('ceftriaxone', 75, 2000, weight);
     const doseVanc = Helpers.getDose('vancomycin', 15, 850, weight);
@@ -62,7 +30,7 @@ class OngoingResusScreen extends Component {
     const doseFluc = Helpers.getDose('fluconazole', 12, 800, weight);
 
     // Actual antibiotic recommendations based on selected population
-    const buttons = ['Healthy >30d', '<30 days', 'Hemonc / BMT', 'Central Line'];
+    const buttons = ['Healthy >30d', '<30 days', 'Cancer / BMT', 'Central Line'];
     const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
     let abxCard = (
       // Default, healthy >30
@@ -107,6 +75,7 @@ class OngoingResusScreen extends Component {
         <View style={ styles.abxButtonGroupContainer }>
           <ButtonGroup
             containerStyle={{minHeight:47, marginBottom: 12}}
+            selectedButtonStyle={{backgroundColor: theme.button}}
             textStyle={{textAlign: 'center'}}
             buttons={buttons}
             selectedIndex={selectedPopulationIdx}
@@ -119,17 +88,16 @@ class OngoingResusScreen extends Component {
   }
 
   render() {
-    // the startOnRender flag indicates that this phase should
-    // be automatically started when the user switches to it
-    if (this.state.active && this.props.navigation.getParam('startOnRender')) {
-      this.restartTimer();
-      this.props.navigation.state.params.startOnRender = false;
-    }
+    const navigation = this.props.navigation;
+    const activePhase = navigation.getParam('activePhase', -1);
+    const pathwayStarted = activePhase >= 2;
+    const weight = navigation.getParam('ptWeight', '');
+    const ptTypeIdx = navigation.getParam('ptTypeIdx', 0);
 
     return (
       <View style={ styles.container }>
-        <ConditionalTimerBar timer={this.timer} onActivate={ this.activate } {...this.state}/>
-        <PatientWeight weight={ this.state.ptWeight } onChange={ this.handleWeightInput } />
+        { !pathwayStarted ? null : <TimerBar timer={ this.timer } /> }
+        <PatientWeight weight={ weight } onChange={ (v) => { navigation.setParams({ptWeight: v}) } } />
         <ScrollView>
           <HTML>
             {`
@@ -140,25 +108,20 @@ class OngoingResusScreen extends Component {
             `}
           </HTML>
 
-          { this.renderSepsisAbxTable(this.state.selAbxIdx, this.state.ptWeight, (newIdx) => this.setState({selAbxIdx: newIdx})) }
+          { this.renderSepsisAbxTable(ptTypeIdx, weight, (v) => navigation.setParams({ptTypeIdx: v})) }
 
           <HTML>
             {`
               <h4>Ongoing Resuscitation</h4>
               <ul>
-                <li>2nd and 3rd boluses of ${Helpers.getBolusDose(this.state.ptWeight)} NS <b>rapidly over 20 minutes OR LESS</b> until perfusion improves or unless rales or hepatomegaly develops</li>
+                <li>2nd and 3rd boluses of ${Helpers.getBolusDose(weight)} NS <b>rapidly over 20 minutes OR LESS</b> until perfusion improves or unless rales or hepatomegaly develops</li>
                 <li>Order vasoactive/inotropic drips</li>
                 <li>Consider blood products</li>
               </ul>
             `}
           </HTML>
         </ScrollView>
-        <StandardPathwayFooter
-          prev="Sepsis1Screen"
-          title="Activate Step 3 (60 min)"
-          target="Sepsis3Screen"
-          params={{ activePhase: 3, startOnRender: true }}
-        />
+        <Footer phaseIndex={ 3 } />
       </View>
     );
   }

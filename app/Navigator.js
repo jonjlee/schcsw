@@ -26,7 +26,7 @@ const PathwaysStack = createStackNavigator(
   
 // Stack for specific pathway
 const SepsisPathwayStack = createStackNavigator(
-  { SepsisPathwayScreen, SepsisCalcScreen, MAPGoalsScreen, ActivateSepsisPathwayScreen, Sepsis1Screen, Sepsis2Screen, Sepsis3Screen, Sepsis4Screen },
+  { SepsisPathwayScreen, ActivateSepsisPathwayScreen, Sepsis1Screen, Sepsis2Screen, Sepsis3Screen, Sepsis4Screen, SepsisCalcScreen, MAPGoalsScreen },
   { defaultNavigationOptions });
 const AsthmaPathwayStack = createStackNavigator(
   { AsthmaPathwayScreen, RSCalcScreen },

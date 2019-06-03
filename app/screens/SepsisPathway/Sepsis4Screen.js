@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
-import { PathwayHeader, HTML, Footer, LinkButton } from '../../common-components';
+import { PathwayHeader, HTML, LinkButton } from '../../common-components';
+import { Footer } from './SepsisNavigator';
 import createStyles from '../../theme';
 
 class SepsisAdmitScreen extends Component {
@@ -12,7 +13,7 @@ class SepsisAdmitScreen extends Component {
         <ScrollView>
           <HTML>
             {`
-              <h4>ICU Criteria</h4>
+              <h4>ICU Criteria at Seattle Children's</h4>
               <ul>
                 <li>Recurrent hypotension after > 40mL/kg in last 12 hours</li>
                 <li>Not appropriate for ongoing fluid resuscitation: cardiac or lung disease, fluid overload, impaired renal function</li>
@@ -21,18 +22,15 @@ class SepsisAdmitScreen extends Component {
                 <li>Continuous ICU monitoring or ICU level respiratory support</li>
               </ul>
               
-              <h4>Inpatient Criteria</h4>
+              <h4>Inpatient Criteria at Seattle Children's</h4>
               <ul>
                 <li>Resolved hypotension AND no signs of sepsis after ≤ 40 mL/kg</li>
                 <li>First dose antibiotics given</li>
-                <li>RISK to follow</li>
               </ul>
             `}
           </HTML>
         </ScrollView>
-        <Footer>
-          <LinkButton icon={{ name: 'chevron-left', color: 'white' }} title="Back" target="Sepsis3Screen" />
-        </Footer>
+        <Footer phaseIndex={ 5 } />
       </View>
     );
   }

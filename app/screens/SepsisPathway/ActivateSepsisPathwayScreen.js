@@ -1,13 +1,17 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
-import { PathwayHeader, LinkButton, HTML, ErrText, PatientWeight, StandardPathwayFooter } from '../../common-components'
-import createStyles from '../../theme';
+import { Card, Input } from 'react-native-elements';
+import { PathwayHeader, LinkButton, HTML, ErrText, Button, PatientWeight } from '../../common-components'
+import { Footer } from './SepsisNavigator';
+import createStyles, { theme } from '../../theme';
 
 class ActivateSepsisPathwayScreen extends Component {
   static navigationOptions = ({ navigation }) => PathwayHeader(navigation, 'Activate Sepsis Pathway');
   
   state = {
     ptWeight: this.props.navigation.getParam('ptWeight', ''),
+    ptAgeUnits: this.props.navigation.getParam('ptAgeUnits', 'yr'),
+    ptAge: this.props.navigation.getParam('ptAge', '')
   }
   
   handleWeightInput = (v) => {
@@ -23,10 +27,6 @@ class ActivateSepsisPathwayScreen extends Component {
           <ErrText>
             Activate ED Sepsis Internal Response
           </ErrText>
-          <PatientWeight
-            style={{ marginTop: 15 }}
-            weight={ this.state.ptWeight }
-            onChange={ this.handleWeightInput } />
           <HTML>
             {`
               <ul>
@@ -38,17 +38,16 @@ class ActivateSepsisPathwayScreen extends Component {
             `}
           </HTML>
         </ScrollView>
-        <StandardPathwayFooter
-          prev="SepsisPathwayScreen"
-          title="Activate Step 1 (15 minutes)"
-          target="Sepsis1Screen"
-          params={{ activePhase: 1, startOnRender: true }}
-        />
+        <Footer phaseIndex={ 1 } />
       </View>
     );
   }
 }
 
+          // <PatientWeight
+          //   style={{ marginTop: 15 }}
+          //   weight={ this.state.ptWeight }
+          //   onChange={ this.handleWeightInput } />
 const styles = createStyles();
 
 export default ActivateSepsisPathwayScreen;

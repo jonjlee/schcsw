@@ -25,7 +25,9 @@ class TimerBar extends Component {
   }
 
   componentWillUnmount() {
-    this.props.timer.onTick = null;
+    if (this.props.timer.onTick === this.onTick) {
+      this.props.timer.onTick = null;
+    }
   }
 
   onTick = () => {
@@ -116,32 +118,6 @@ TimerBar.propTypes = {
   onDone: PropTypes.func,
 }
 
-// A card that either displays a timer if props.active or text with a start button
-export const ConditionalTimerBar = (props) => {
-  if (props.active) {
-    return (<TimerBar timer={ props.timer } />);
-  } else if (props.pending) {
-    return (
-      <Card containerStyle={ styles.banner }>
-        <View style={{flexDirection: 'row'}}>
-          <SectionHead>Step Not Active</SectionHead>
-          <Button title="Start Now" type="outline" onPress={ props.onActivate } />
-        </View>
-      </Card>
-    );
-  } else if (props.done) {
-    return (
-      <Card containerStyle={ styles.banner }>
-        <View style={{flexDirection: 'row'}}>
-          <SectionHead>Step Completed</SectionHead>
-          <Button title="Restart" type="outline" onPress={ props.onActivate } />
-        </View>
-      </Card>
-    );
-  }
-  return null;
-}
-
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
@@ -151,9 +127,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 2,
     borderColor: theme.okBorder,
-  },
-  banner: {
-    marginHorizontal: 5,
   },
   
   // Info panel to left

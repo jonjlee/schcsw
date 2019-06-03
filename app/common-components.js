@@ -131,40 +131,6 @@ export const Footer = (props) => {
   );
 }
 
-// Footer with 3 buttons that call props.navigation.navigate(): a central button and previous/next buttons
-export const StandardPathwayFooter = (props) => {
-  const { prev, title, target, params={}, style } = props;
-  return (
-    <Footer style={ style }>
-      <View style={{flexDirection: 'row', justifyContent: 'center'}}>
-        { prev ?
-            <View style={{flex:1}}>
-              <LinkButton
-                buttonStyle={ FooterStyles.leftButton }
-                icon={{ name: 'chevron-left', color: 'white' }}
-                target={ prev } />
-            </View>
-          : null
-        }
-        <View style={{flex:5}}>
-          <LinkButton
-            buttonStyle={ prev ? FooterStyles.middleButton : FooterStyles.leftButton }
-            title={ title }
-            target={ target }
-            params={ params }
-          />
-        </View>
-        <View style={{flex:1}}>
-          <LinkButton
-            buttonStyle={ FooterStyles.rightButton }
-            icon={{ name: 'chevron-right', color: 'white' }}
-            target={ target } />
-        </View>
-      </View>
-    </Footer>
-  );
-}
-
 export const PatientWeight = (props) => {
   const { style } = props;
   return (
@@ -238,25 +204,7 @@ const FooterStyles = StyleSheet.create({
     marginBottom: 10,
     height: 1,
     backgroundColor: theme.divider,
-  },
-  leftButton: {
-    borderTopLeftRadius: 5,
-    borderBottomLeftRadius: 5,
-    borderTopRightRadius: 0,
-    borderBottomRightRadius: 0,
-    minHeight: 42,
-  },
-  middleButton: {
-    borderRadius: 0,
-    minHeight: 42,
-  },
-  rightButton: {
-    borderTopLeftRadius: 0,
-    borderBottomLeftRadius: 0,
-    borderTopRightRadius: 5,
-    borderBottomRightRadius: 5,
-    minHeight: 42,
-  },
+  }
 });
 
 const PatientWeightStyles = StyleSheet.create({
