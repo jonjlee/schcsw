@@ -93,11 +93,11 @@ class SepsisPathwayScreen extends Component {
             `}
           </HTML>
           <Card containerStyle={ [{ marginTop: 0, marginHorizontal: 15, paddingTop: 5, paddingBottom: 8 }] }>
-            <View style={{     flexDirection: 'row', justifyContent: 'center', alignItems:'center' }}>
+            <View style={{     flexDirection: 'row', justifyContent: 'space-between', alignItems:'center' }}>
               <View>
                 <Text style={{ fontSize: theme.fontSizeLg }}> Weight:</Text>
               </View>
-              <View style={{ width: 75 }}>
+              <View style={{ minWidth: 60 }}>
                 <Input
                   placeholder="?"
                   keyboardType="numeric"
@@ -109,9 +109,9 @@ class SepsisPathwayScreen extends Component {
                 <Text style={{ fontSize: theme.fontSizeLg }}>kg</Text>
               </View>
               <View>
-                <Text style={{ fontSize: theme.fontSizeLg, marginLeft: 30 }}> Age:</Text>
+                <Text style={{ fontSize: theme.fontSizeLg, marginLeft: 25 }}> Age:</Text>
               </View>
-              <View style={{ width: 75 }}>
+              <View style={{ minWidth: 60 }}>
                 <Input
                   placeholder="?"
                   keyboardType="numeric"
@@ -122,13 +122,13 @@ class SepsisPathwayScreen extends Component {
               <View>
                 <View style={{ flexDirection: 'column'}}>
                   <Button
-                    buttonStyle={{ height: 22, width: 35, borderRadius: 0 }}
+                    buttonStyle={{ minHeight: 22, minWidth: 25, padding: 0, borderRadius: 0 }}
                     titleStyle={{fontSize: theme.fontSizeSm}}
                     type={ageUnit=='mo' ? 'solid' : 'outline'}
                     onPress={ () => navigation.setParams({ptAgeUnit: 'mo'}) }
                     title="mo" />
                   <Button
-                    buttonStyle={{ height: 22, width: 35, borderRadius: 0 }}
+                    buttonStyle={{ minHeight: 22, minWidth: 25, padding: 0, borderRadius: 0 }}
                     titleStyle={{fontSize: theme.fontSizeSm}}
                     type={ageUnit=='yr' ? 'solid' : 'outline'}
                     onPress={ () => navigation.setParams({ptAgeUnit: 'yr'}) }
@@ -138,14 +138,15 @@ class SepsisPathwayScreen extends Component {
             </View>
             <View style={{     flexDirection: 'row', justifyContent: 'center', alignItems:'center', paddingTop: 10  }}>
               <View>
-                <Text style={{ fontSize: theme.fontSizeLg }}>Category:</Text>
+                <Text style={{ fontSize: theme.fontSizeLg }}>Type:</Text>
               </View>
               <View style={{flex:1}}>
                 <ButtonGroup
-                  containerStyle={{marginLeft: 8}}
+                  containerStyle={{marginLeft: 8, minHeight: 47}}
                   buttonStyle={{ paddingHorizontal: 4, minHeight:30, minWidth: 45 }}
                   selectedButtonStyle={{backgroundColor: theme.button}}
-                  textStyle={{textAlign: 'center'}}
+                  textStyle={{textAlign: 'center', fontSize: theme.fontSizeSm
+                  }}
                   buttons={['Healthy >30d', '<30 days', 'Cancer / BMT', 'Central Line']}
                   selectedIndex={navigation.getParam('ptTypeIdx', 0)}
                   onPress={(idx) => navigation.setParams({ptTypeIdx: idx})}
