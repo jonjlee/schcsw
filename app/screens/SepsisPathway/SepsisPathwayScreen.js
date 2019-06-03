@@ -80,16 +80,7 @@ class SepsisPathwayScreen extends Component {
                 <li>Clinical concern for sepsis/septic shock OR ED Sepsis Score &geq; 3 (<a href="#sepsis-calc">Sepsis Score calculator</a>)</li>
                 <li>Attending/fellow assessment with concern for sepsis/septic shock</li>
               </ul>
-              <h4>Signs &amp; Symptoms of Sepsis</h4>
-              <ul>
-                <li>Hypotension${ this.getMAPforAge(age, ageUnit) } (<a href="#map-goals">MAP &leq; 5% for age</a>)</li>
-                <li>Tachycardia</li>
-                <li>Poor perfusion</li>
-                <li>Reduced urine output</li>
-                <li>Tachypnea / new oxygen requirment</li>
-                <li>Mental status changes</li>
-              </ul>
-              <h4>Patient Demographics:</h4>
+              <h4>Patient Demographics</h4>
             `}
           </HTML>
           <Card containerStyle={ [{ marginTop: 0, marginHorizontal: 15, paddingTop: 5, paddingBottom: 8 }] }>
@@ -154,6 +145,19 @@ class SepsisPathwayScreen extends Component {
               </View>
             </View>
           </Card>
+          <HTML onLinkPress={ this.onLinkPress }>
+            {`
+              <h4>Signs &amp; Symptoms of Sepsis</h4>
+              <ul>
+                <li>Hypotension${ this.getMAPforAge(age, ageUnit) } (<a href="#map-goals">MAP &leq; 5% for age</a>)</li>
+                <li>Tachycardia</li>
+                <li>Poor perfusion</li>
+                <li>Reduced urine output</li>
+                <li>Tachypnea / new oxygen requirment</li>
+                <li>Mental status changes</li>
+              </ul>
+            `}
+          </HTML>
         </ScrollView>
         <Footer phaseIndex={ 0 } />
       </View>
