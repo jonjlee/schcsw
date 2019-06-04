@@ -9,7 +9,7 @@ import Helpers from '../../helpers';
 import createStyles, { theme } from '../../theme';
 
 class InitialResusScreen extends Component {
-  static navigationOptions = ({ navigation }) => PathwayHeader(navigation, 'Step 1: Initial 15 Minutes');
+  static navigationOptions = ({ navigation }) => PathwayHeader(navigation, 'Step 1: Initial 15 Minutes (30s For Demo)');
   
   constructor(props) {
     super(props);

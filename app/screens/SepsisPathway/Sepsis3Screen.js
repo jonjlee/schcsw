@@ -8,7 +8,7 @@ import TimerBar from '../../TimerBar';
 import createStyles from '../../theme';
 
 class FollowupResusScreen extends Component {
-  static navigationOptions = ({ navigation }) => PathwayHeader(navigation, 'Step 3: Within 60 Minutes');
+  static navigationOptions = ({ navigation }) => PathwayHeader(navigation, 'Step 3: Within 60 Minutes (5m For Demo)');
   
   constructor(props) {
     super(props);

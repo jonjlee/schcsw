@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import { LinkButton, Footer as CommonFooter } from '../../common-components';
+import { theme } from '../../theme';
 import Timers from '../../Timers';
 
 // A footer with three buttons: prev, next, and a central button that is either 'Complete Step' or 'Back to Active Step'
@@ -14,56 +15,60 @@ const FooterComponent = (props) => {
   const prev = phases[phaseIndex-1] || null;
   const next = phases[phaseIndex+1] || null;
   const isActive = (phaseIndex <= 1 && activePhase <= 1) || (phaseIndex == activePhase);
+  const onStep1BeforeActive = (phaseIndex === 2 && activePhase < 2);
   
-  // <, >, and Back buttons
+  // Left and right buttons are disabled at first and last steps
+  const leftDisabled = (prev === null);
+  const rightDisabled = (next === null);
+  const goDisabled = (isActive && current.btn === null);
+  const leftColor = leftDisabled ? theme.greyText : theme.button;
+  const rightColor = rightDisabled ? theme.greyText : theme.button;
+  
+  // < and > buttons
   const PrevButton = (
     <LinkButton
       buttonStyle={ styles.leftButton }
-      icon={{ name: 'chevron-left', color: 'white' }}
+      type="outline"
+      disabled={ leftDisabled }
+      icon={{ name: 'chevron-left', color: leftColor }}
       target={ prev && prev.screen } />);
   const NextButton = (
     <LinkButton
       buttonStyle={ styles.rightButton }
-      icon={{ name: 'chevron-right', color: 'white' }}
+      type="outline"
+      disabled={ rightDisabled }
+      icon={{ name: 'chevron-right', color: rightColor }}
       target={ next && next.screen } />);
-  const BackButton = (
-    <LinkButton
-      icon={{ name: 'chevron-left', color: 'white' }}
-      title="Back"
-      target={ prev && prev.screen } />);
 
   // Center button returns to active step if not there. If at active step, call onGoPress().
-  const GoButton = (
+  const GoButton = goDisabled ? null : (
     <LinkButton
-      buttonStyle={ prev ? styles.middleButton : styles.leftButton }
-      title={ isActive ? current.btn : 'Back to Active Step' }
+      buttonStyle={ styles.middleButton }
+      title={ isActive ? current.btn : 'Back to ' + active.title }
+      type= { isActive ? 'solid' : 'outline' }
       target={ isActive ? next && next.screen : active.screen }
-      onPress={ isActive ? () => onGoPress(navigation, current) : null }
-    />);
+      onPress={ isActive ? () => onGoPress(navigation, current) : null } />);
+    
+  // If at Step 1, but active step is before Step 1, then make big button "Start Step 1",
+  // which simulates button press from Activate screen
+  const StartStep1 = (
+    <LinkButton
+      buttonStyle={ styles.middleButton }
+      title={ "Start " + current.title }
+      target={ current.screen }
+      onPress={ () => onGoPress(navigation, prev) } />);
   
-  // Conditionally render buttons depending on if 1st, last, or middle step
-  if (prev === null) {
-    return (
-      <CommonFooter>
-        <View style={ styles.buttonsContainer }>
-          <View style={{flex:6}}>{ GoButton }</View>
-          <View style={{flex:1}}>{ NextButton }</View>
-        </View>
-      </CommonFooter>
-    );
-  } else if (next === null) {
-    return (<CommonFooter>{ BackButton }</CommonFooter>);
-  } else {
-    return (
-      <CommonFooter>
-        <View style={ styles.buttonsContainer }>
-          <View style={{flex:1}}>{ PrevButton }</View>
-          <View style={{flex:5}}>{ GoButton }</View>
-          <View style={{flex:1}}>{ NextButton }</View>
-        </View>
-      </CommonFooter>
-    );
-  }
+  // Render buttons
+  const ActionButton = onStep1BeforeActive ? StartStep1 : GoButton;
+  return (
+    <CommonFooter>
+      <View style={ styles.buttonsContainer }>
+        <View>{ PrevButton }</View>
+        <View style={{flex:1}}>{ ActionButton }</View>
+        <View>{ NextButton }</View>
+      </View>
+    </CommonFooter>
+  );
 }
 export const Footer = withNavigation(FooterComponent);
 
@@ -74,27 +79,33 @@ export const Footer = withNavigation(FooterComponent);
 const phases = [
   {
     screen: 'SepsisPathwayScreen',
+    title: 'Intro',
     btn: 'Start',
   },
   {
     screen: 'ActivateSepsisPathwayScreen',
-    btn: 'Start Step 1 (15 min)'
+    title: 'Activation Step',
+    btn: 'Start Step 1 (15 min)',
   },
   {
     screen: 'Sepsis1Screen',
-    btn: 'Complete Step'
+    title: 'Step 1',
+    btn: 'Complete Step 1',
   },
   {
     screen: 'Sepsis2Screen',
-    btn: 'Complete Step'
+    title: 'Step 2',
+    btn: 'Complete Step 2',
   },
   {
     screen: 'Sepsis3Screen',
-    btn: 'Complete Step'
+    title: 'Step 3',
+    btn: 'Complete Step 3',
   },
   {
     screen: 'Sepsis4Screen',
-    btn: 'Back'
+    title: 'Step 4',
+    btn: null,
   },
 ];
 
@@ -141,21 +152,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   leftButton: {
-    borderTopLeftRadius: 5,
-    borderBottomLeftRadius: 5,
-    borderTopRightRadius: 0,
-    borderBottomRightRadius: 0,
-    minHeight: 42,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    padding: 0,
   },
   middleButton: {
-    borderRadius: 0,
+    borderRadius: 21,
     minHeight: 42,
+    marginHorizontal: 10,
   },
   rightButton: {
-    borderTopLeftRadius: 0,
-    borderBottomLeftRadius: 0,
-    borderTopRightRadius: 5,
-    borderBottomRightRadius: 5,
-    minHeight: 42,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    padding: 0,
   },
 });

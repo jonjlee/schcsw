@@ -9,7 +9,7 @@ import Helpers from '../../helpers';
 import createStyles, { theme } from '../../theme';
 
 class OngoingResusScreen extends Component {
-  static navigationOptions = ({ navigation }) => PathwayHeader(navigation, 'Step 2: Within 30 Minutes', { headerLeft: null });
+  static navigationOptions = ({ navigation }) => PathwayHeader(navigation, 'Step 2: Within 30 Minutes (2m For Demo)', { headerLeft: null });
 
   constructor(props) {
     super(props);
