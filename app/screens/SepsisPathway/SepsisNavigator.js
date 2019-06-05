@@ -122,7 +122,12 @@ const onGoPress = (navigation, phase) => {
     const timer = Timers.replace('sepsis', {
       duration: 30,
       notifyTitle: 'Sepsis Pathway',
-      notifyBody: '15 minutes elapsed. Proceed to step 2.'
+      notifyBody: '15 minutes elapsed. Proceed to step 2.',
+      alerts: [
+        { at: 30, say: '30 seconds', vibrate: true },
+        { at: 120, say: '2 minutes', vibrate: true },
+        { at: 5*60, say: '5 minutes', vibrate: true },
+      ]
     });
     timer.start();
     navigation.state.params.activePhase = 2;

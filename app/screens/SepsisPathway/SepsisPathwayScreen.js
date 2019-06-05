@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Text, View, ScrollView } from 'react-native';
-import { Card, Input, ButtonGroup } from 'react-native-elements';
 import { PathwayHeader, Button, HTML } from '../../common-components';
 import { Footer } from './SepsisNavigator';
 
@@ -15,10 +14,6 @@ class SepsisPathwayScreen extends Component {
     } else if (href === '#map-goals') {
       this.props.navigation.navigate('MAPGoalsScreen');
     }
-  }
-  
-  handleInput = (key) => {
-    return (v) => { this.props.navigation.setParams({[key]: v}) };
   }
   
   getMAPforAge = (age, unit) => {
@@ -65,10 +60,8 @@ class SepsisPathwayScreen extends Component {
 
   render() {
     const navigation = this.props.navigation;
-    const weight = navigation.getParam('ptWeight', '');
     const age = navigation.getParam('ptAge', '');
     const ageUnit = navigation.getParam('ptAgeUnit', 'yr');
-    const typeIdx = navigation.getParam('ptTypeIdx', 0);
     
     return (
       <View style={ styles.container }>
@@ -80,73 +73,6 @@ class SepsisPathwayScreen extends Component {
                 <li>Clinical concern for sepsis/septic shock OR ED Sepsis Score &geq; 3 (<a href="#sepsis-calc">Sepsis Score calculator</a>)</li>
                 <li>Attending/fellow assessment with concern for sepsis/septic shock</li>
               </ul>
-              <h4>Patient Demographics</h4>
-            `}
-          </HTML>
-          <Card containerStyle={ [{ marginTop: 0, marginHorizontal: 15, paddingTop: 5, paddingBottom: 8 }] }>
-            <View style={{     flexDirection: 'row', justifyContent: 'space-between', alignItems:'center' }}>
-              <View>
-                <Text style={{ fontSize: theme.fontSizeLg }}> Weight:</Text>
-              </View>
-              <View style={{ minWidth: 60 }}>
-                <Input
-                  placeholder="?"
-                  keyboardType="numeric"
-                  textAlign="center"
-                  value={ weight }
-                  onChangeText={ this.handleInput('ptWeight') } />
-              </View>
-              <View>
-                <Text style={{ fontSize: theme.fontSizeLg }}>kg</Text>
-              </View>
-              <View>
-                <Text style={{ fontSize: theme.fontSizeLg, marginLeft: 25 }}> Age:</Text>
-              </View>
-              <View style={{ minWidth: 60 }}>
-                <Input
-                  placeholder="?"
-                  keyboardType="numeric"
-                  textAlign="center"
-                  value={ age }
-                  onChangeText={ this.handleInput('ptAge') } />
-              </View>
-              <View>
-                <View style={{ flexDirection: 'column'}}>
-                  <Button
-                    buttonStyle={{ minHeight: 22, minWidth: 25, padding: 0, borderRadius: 0 }}
-                    titleStyle={{fontSize: theme.fontSizeSm}}
-                    type={ageUnit=='mo' ? 'solid' : 'outline'}
-                    onPress={ () => navigation.setParams({ptAgeUnit: 'mo'}) }
-                    title="mo" />
-                  <Button
-                    buttonStyle={{ minHeight: 22, minWidth: 25, padding: 0, borderRadius: 0 }}
-                    titleStyle={{fontSize: theme.fontSizeSm}}
-                    type={ageUnit=='yr' ? 'solid' : 'outline'}
-                    onPress={ () => navigation.setParams({ptAgeUnit: 'yr'}) }
-                    title="yr" />
-                </View>
-              </View>
-            </View>
-            <View style={{     flexDirection: 'row', justifyContent: 'center', alignItems:'center', paddingTop: 10  }}>
-              <View>
-                <Text style={{ fontSize: theme.fontSizeLg }}>Type:</Text>
-              </View>
-              <View style={{flex:1}}>
-                <ButtonGroup
-                  containerStyle={{marginLeft: 8, minHeight: 47}}
-                  buttonStyle={{ paddingHorizontal: 4, minHeight:30, minWidth: 45 }}
-                  selectedButtonStyle={{backgroundColor: theme.button}}
-                  textStyle={{textAlign: 'center', fontSize: theme.fontSizeSm
-                  }}
-                  buttons={['Healthy >30d', '<30 days', 'Cancer / BMT', 'Central Line']}
-                  selectedIndex={navigation.getParam('ptTypeIdx', 0)}
-                  onPress={(idx) => navigation.setParams({ptTypeIdx: idx})}
-                />
-              </View>
-            </View>
-          </Card>
-          <HTML onLinkPress={ this.onLinkPress }>
-            {`
               <h4>Signs &amp; Symptoms of Sepsis</h4>
               <ul>
                 <li>Hypotension${ this.getMAPforAge(age, ageUnit) } (<a href="#map-goals">MAP &leq; 5% for age</a>)</li>

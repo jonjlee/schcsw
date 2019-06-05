@@ -1,5 +1,5 @@
-import { AppState } from 'react-native';
-import { Notifications } from 'expo';
+import { AppState, Vibration } from 'react-native';
+import { Notifications, Speech } from 'expo';
 import { format, addSeconds, differenceInSeconds } from 'date-fns';
 
 // A global manager for timers running in the app
@@ -132,7 +132,7 @@ class Timers {
   // Helpers
   // -------------------------------------------
   // Create a new timer and return it in paused state
-  _create = (id, { duration=0, onTick, onDone, notifyTitle, notifyBody, vibrate }) => {
+  _create = (id, { duration=0, onTick, onDone, notifyTitle, notifyBody, alerts }) => {
     // sanity check for duration
     duration = (duration && duration > 0) ? duration : 0;
 
@@ -153,7 +153,7 @@ class Timers {
       notificationTime: null,
       notifyTitle: notifyTitle,
       notifyBody: notifyBody,
-      vibrate: true,
+      alerts: alerts, // format [{at: seconds, say: 'alert to speak', vibrate: false}, ...]
 
       // time details; duration and lapsed are in seconds
       duration: duration,
@@ -180,6 +180,9 @@ class Timers {
   // Called by every timer every second
   _tick = (timer) => {
     timer.lapsed += 1;
+    
+    // Execute alerts
+    this._doAlerts(timer);
     
     // Transition timer to expired if seconds lapsed equals set timer duration, and not already expired
     let expiring = false;
@@ -211,6 +214,22 @@ class Timers {
       );
     } catch (e) {
       console.log(new Date(), 'Could not schedule timer notification', e);
+    }
+  }
+  
+  // Use text-to-speech to say any alerts that are due at the current lapsed time
+  _doAlerts = (timer) => {
+    if (timer.alerts) {
+      timer.alerts.forEach(alrt => {
+        if (timer.lapsed == alrt.at) {
+          if (alrt.say && Speech && Speech.speak) {
+            Speech.speak(alrt.say);
+          }
+          if (alrt.vibrate && Vibration && Vibration.vibrate) {
+            Vibration.vibrate();
+          }
+        }
+      })
     }
   }
 
