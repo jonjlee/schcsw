@@ -3,6 +3,7 @@ import { StyleSheet, View, ScrollView } from 'react-native';
 import { PathwayHeader, SectionHead, Text, Button, Bullet, LinkButton, HTML, PatientWeight } from '../../common-components';
 import { Footer } from './SepsisNavigator';
 import { Card, Input, ButtonGroup } from 'react-native-elements';
+import BroselowAccessory from './BroselowAccessory';
 import Timers from '../../Timers';
 import TimerBar from '../../TimerBar';
 import Helpers from '../../helpers';
@@ -97,7 +98,8 @@ class OngoingResusScreen extends Component {
     return (
       <View style={ styles.container }>
         { !pathwayStarted ? null : <TimerBar timer={ this.timer } /> }
-        <PatientWeight weight={ weight } onChange={ (v) => { navigation.setParams({ptWeight: v}) } } />
+        <PatientWeight inputAccessoryViewID={ BroselowAccessory.ID } weight={ weight } onChange={ (v) => { navigation.setParams({ptWeight: v}) } } />
+        <BroselowAccessory.View />
         <ScrollView>
           <HTML>
             {`

@@ -125,8 +125,9 @@ const onGoPress = (navigation, phase) => {
       notifyBody: '15 minutes elapsed. Proceed to step 2.',
       alerts: [
         { at: 30, say: '30 seconds', vibrate: true },
-        { at: 120, say: '2 minutes', vibrate: true },
-        { at: 5*60, say: '5 minutes', vibrate: true },
+        { at: 15*60, say: '15 minutes', vibrate: true },
+        { at: 30*60, say: '30 minutes', vibrate: true },
+        { at: 60*60, say: '60 minutes', vibrate: true },
       ]
     });
     timer.start();
@@ -134,13 +135,13 @@ const onGoPress = (navigation, phase) => {
   } else if (phase.screen === 'Sepsis1Screen') {
     // Increase timer to 30 minutes from initial pathway activation, and advance to step 2
     const timer = Timers.get('sepsis');
-    timer.changeDuration(120);
+    timer.changeDuration(30*60);
     timer.changeNotification('Sepsis Pathway', '30 minutes elapsed. Proceed to step 3.');
     navigation.state.params.activePhase = 3;
   } else if (phase.screen === 'Sepsis2Screen') {
     // Increase timer to 60 minutes from initial pathway activation, and advance to step 3
     const timer = Timers.get('sepsis');
-    timer.changeDuration(5 * 60);
+    timer.changeDuration(60*60);
     timer.changeNotification('Sepsis Pathway', '60 minutes elapsed. Proceed to admission.');
     navigation.state.params.activePhase = 4;
   } else if (phase.screen === 'Sepsis3Screen') {

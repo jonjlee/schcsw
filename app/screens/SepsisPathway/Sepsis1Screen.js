@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, ScrollView } from 'react-native';
 import { Card } from 'react-native-elements';
 import { PathwayHeader, SectionHead, Button, LinkButton, HTML, PatientWeight } from '../../common-components';
 import { Footer } from './SepsisNavigator';
+import BroselowAccessory from './BroselowAccessory';
 import Timers from '../../Timers';
 import TimerBar from '../../TimerBar';
 import Helpers from '../../helpers';
@@ -15,27 +16,25 @@ class InitialResusScreen extends Component {
     super(props);
 
     const activePhase = this.props.navigation.getParam('activePhase');
-    this.state = {
-      ptWeight: this.props.navigation.getParam('ptWeight', ''),
-    }
     this.timer = Timers.get('sepsis');
   }
 
   handleWeightInput = (v) => {
     // update both navigator state and react state
     this.props.navigation.setParams({ptWeight: v});
-    this.setState({ptWeight: v});
   }
 
   render() {
-    const activePhase = this.props.navigation.getParam('activePhase', -1);
+    const navigation = this.props.navigation;
+    const activePhase = navigation.getParam('activePhase', -1);
     const pathwayStarted = activePhase >= 2;
-    const weight = this.state.ptWeight ? parseFloat(this.state.ptWeight) : 0;
+    const weight = navigation.getParam('ptWeight', '');
 
     return (
       <View style={ styles.container }>
         { !pathwayStarted ? null : <TimerBar timer={ this.timer } /> }
-        <PatientWeight weight={ this.state.ptWeight } onChange={ this.handleWeightInput } />
+        <PatientWeight inputAccessoryViewID={ BroselowAccessory.ID } weight={ weight } onChange={ this.handleWeightInput } />
+        <BroselowAccessory.View />
         <ScrollView>
           <HTML>
             {`
@@ -60,7 +59,7 @@ class InitialResusScreen extends Component {
               
               <h4>Initial Fluid Resuscitation</h4>
               <ul>
-                <li>Administer 1st bolus of ${Helpers.getBolusDose(this.state.ptWeight)} normal saline <b>rapidly over 20 minutes OR LESS</li>
+                <li>Administer 1st bolus of ${Helpers.getBolusDose(weight)} normal saline <b>rapidly over 20 minutes OR LESS</li>
                 <li>Consider 5-10 mL/kg boluses if concern for fluid intolerance (cardiac/renal dysfunction)</li>
                 <li>Give stress dose steroids if known adrenal insufficiency</li>
                 <li>Correct glucose and calcium</li>

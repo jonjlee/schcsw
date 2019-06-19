@@ -10,7 +10,7 @@ const styles = createStyles();
 // A button styled with our theme colors
 export const Button = (props) => {
   const { type, buttonStyle, ...rest } = props;
-  const backgroundColor = (type === 'outline') ? { backgroundColor: 'transparent' } : null;
+  const backgroundColor = (type === 'outline' || type === 'clear') ? { backgroundColor: 'transparent' } : null;
   return (
     <RNEButton
       buttonStyle={ StyleSheet.flatten([ styles.button, backgroundColor, buttonStyle ]) }
@@ -132,7 +132,7 @@ export const Footer = (props) => {
 }
 
 export const PatientWeight = (props) => {
-  const { style } = props;
+  const { style, inputAccessoryViewID } = props;
   return (
     <Card containerStyle={ [PatientWeightStyles.ptWeightCard, style] }>
       <View style={ PatientWeightStyles.ptWeightContainer }>
@@ -145,6 +145,7 @@ export const PatientWeight = (props) => {
             keyboardType="numeric"
             textAlign="center"
             value={ props.weight }
+            inputAccessoryViewID={ inputAccessoryViewID }
             onChangeText={ props.onChange } />
         </View>
         <View>
