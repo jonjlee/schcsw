@@ -1,5 +1,5 @@
 import React from 'react';
-import { Permissions } from 'expo';
+import * as Permissions from 'expo-permissions';
 import { createAppContainer } from 'react-navigation';
 import Navigator from './app/Navigator';
 

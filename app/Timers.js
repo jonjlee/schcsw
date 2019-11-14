@@ -1,5 +1,6 @@
 import { AppState, Vibration } from 'react-native';
-import { Notifications, Speech } from 'expo';
+import { Notifications } from 'expo';
+import * as Speech from 'expo-speech';
 import { format, addSeconds, differenceInSeconds } from 'date-fns';
 
 // A global manager for timers running in the app
